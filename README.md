@@ -36,10 +36,20 @@ Perform the following steps to use the provider:
 provider "kind" {
 
 }
-# creating a cluster with kind of the name "test-cluster" with kubernetes version v1.15.3
+# creating a cluster with kind of the name "test-cluster" with kubernetes version v1.15.3 as is hardcoded in kind 0.5.1
 resource "kind" "my-cluster" {
     name = "test-cluster"
-    k8s_version = "v1.15.3"
+}
+```
+To override the base image used, you can specify in addition the `base_image` like so:
+```
+provider "kind" {
+
+}
+# creating a cluster with kind of the name "test-cluster" with kubernetes version v1.16.1
+resource "kind" "my-cluster" {
+    name = "test-cluster"
+    base_image = "kindest/node:v1.16.1"
 }
 ```
 1. Initialize Terraform:
