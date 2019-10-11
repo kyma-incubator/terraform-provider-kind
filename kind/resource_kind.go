@@ -18,7 +18,7 @@ func resourceKindCreate(d *schema.ResourceData, meta interface{}) error {
 	log.Println("Creating local Kubernetes cluster...")
 	name := d.Get("name").(string)
 	ctx := cluster.NewContext(name)
-	baseImage := d.Get("base_image").(string)
+	baseImage := d.Get("node_image").(string)
 
 	log.Println("=================== Creating Kind Cluster ==================")
 	var opts []create.ClusterOption
@@ -27,7 +27,7 @@ func resourceKindCreate(d *schema.ResourceData, meta interface{}) error {
 		opts = append(opts, create.WithNodeImage(baseImage))
 		log.Printf("Using defined base image: %s\n", baseImage)
 	} else {
-		d.Set("base_image", kindDefaults.Image) // set image to k/kind default image.
+		d.Set("node_image", kindDefaults.Image) // set image to k/kind default image.
 		baseImage = kindDefaults.Image
 	}
 
@@ -64,8 +64,8 @@ func resourceKindUpdate(d *schema.ResourceData, meta interface{}) error {
 	log.Println("")
 	d.Partial(true)
 
-	if d.HasChange("base_image") {
-		d.SetPartial("base_image")
+	if d.HasChange("node_image") {
+		d.SetPartial("node_image")
 	}
 	if d.HasChange("name") {
 		d.SetPartial("name")

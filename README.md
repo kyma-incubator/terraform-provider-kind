@@ -41,7 +41,7 @@ resource "kind" "my-cluster" {
     name = "test-cluster"
 }
 ```
-To override the base image used, you can specify in addition the `base_image` like so:
+To override the base image used, you can specify in addition the `node_image` like so:
 ```
 provider "kind" {
 
@@ -49,7 +49,7 @@ provider "kind" {
 # creating a cluster with kind of the name "test-cluster" with kubernetes version v1.16.1
 resource "kind" "my-cluster" {
     name = "test-cluster"
-    base_image = "kindest/node:v1.16.1"
+    node_image = "kindest/node:v1.16.1"
 }
 ```
 1. Initialize Terraform:
