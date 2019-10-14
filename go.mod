@@ -1,4 +1,4 @@
-module github.com/tehcyx/terraform-prodiver-kind
+module github.com/kyma-incubator/terraform-prodiver-kind
 
 go 1.12
 

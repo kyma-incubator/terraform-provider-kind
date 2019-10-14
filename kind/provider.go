@@ -16,7 +16,7 @@ func resourceKind() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceKindCreate,
 		Read:   resourceKindRead,
-		Update: resourceKindUpdate,
+		// Update: resourceKindUpdate,
 		Delete: resourceKindDelete,
 
 		Schema: map[string]*schema.Schema{
@@ -24,11 +24,14 @@ func resourceKind() *schema.Resource {
 				Type:        schema.TypeString,
 				Description: "The kind name that is given to the created cluster",
 				Required:    true,
+				ForceNew:    true,
 			},
-			"k8s_version": &schema.Schema{
+			"node_image": &schema.Schema{
 				Type:        schema.TypeString,
-				Description: `The kubernetes version that the kind will use (ex: v1.15.3) valid values are tags from https://hub.docker.com/r/kindest/node/tags`,
-				Required:    true,
+				Description: `The node_image that kind will use (ex: kindest/node:v1.15.3)`,
+				Optional:    true,
+				ForceNew:    true,
+				Computed:    true,
 			},
 			"k8s_kubeconfig_path": &schema.Schema{
 				Type:        schema.TypeString,

@@ -33,7 +33,7 @@ if [ "$1" == "$CI_FLAG" ]; then
 	buildEnv="env CGO_ENABLED=0"
 fi
 
-${buildEnv} go build -o bin/terraform-provider-gardener
+${buildEnv} go build -o bin/terraform-provider-kind
 
 goBuildResult=$?
 if [ ${goBuildResult} != 0 ]; then
