@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	clientcmd "k8s.io/client-go/tools/clientcmd"
 	kindDefaults "sigs.k8s.io/kind/pkg/apis/config/defaults"
 	cluster "sigs.k8s.io/kind/pkg/cluster"
 	create "sigs.k8s.io/kind/pkg/cluster/create"
@@ -54,6 +55,17 @@ func resourceKindRead(d *schema.ResourceData, meta interface{}) error {
 
 	k8sKubeconfigPath := ctx.KubeConfigPath()
 	d.Set("k8s_kubeconfig_path", k8sKubeconfigPath)
+
+	// use the current context in kubeconfig
+	config, err := clientcmd.BuildConfigFromFlags("", k8sKubeconfigPath)
+	if err != nil {
+		return err
+	}
+
+	d.Set("client_certificate", string(config.CertData))
+	d.Set("client_key", string(config.KeyData))
+	d.Set("cluster_ca_certificate", string(config.CAData))
+	d.Set("endpoint", string(config.Host))
 
 	d.Set("completed", true)
 

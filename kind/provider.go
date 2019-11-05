@@ -38,6 +38,26 @@ func resourceKind() *schema.Resource {
 				Description: `Kubeconfig path set after the the cluster is created.`,
 				Computed:    true,
 			},
+			"client_certificate": &schema.Schema{
+				Type:        schema.TypeString,
+				Description: `Client certificate for authenticating to cluster.`,
+				Computed:    true,
+			},
+			"client_key": &schema.Schema{
+				Type:        schema.TypeString,
+				Description: `Client key for authenticating to cluster.`,
+				Computed:    true,
+			},
+			"cluster_ca_certificate": &schema.Schema{
+				Type:        schema.TypeString,
+				Description: `Client verifies the server certificate with this CA cert.`,
+				Computed:    true,
+			},
+			"endpoint": &schema.Schema{
+				Type:        schema.TypeString,
+				Description: `Kubernetes APIServer endpoint.`,
+				Computed:    true,
+			},
 		},
 	}
 }
