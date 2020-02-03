@@ -1,7 +1,15 @@
 package kind
 
 import (
+	"time"
+
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+)
+
+const (
+	defaultCreateTimeout = time.Minute * 30
+	defaultUpdateTimeout = time.Minute * 30
+	defaultDeleteTimeout = time.Minute * 20
 )
 
 func Provider() *schema.Provider {
@@ -19,6 +27,12 @@ func resourceKind() *schema.Resource {
 		// Update: resourceKindUpdate,
 		Delete: resourceKindDelete,
 
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(defaultCreateTimeout),
+			Update: schema.DefaultTimeout(defaultUpdateTimeout),
+			Delete: schema.DefaultTimeout(defaultDeleteTimeout),
+		},
+
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{
 				Type:        schema.TypeString,
@@ -33,7 +47,7 @@ func resourceKind() *schema.Resource {
 				ForceNew:    true,
 				Computed:    true,
 			},
-			"k8s_kubeconfig_path": &schema.Schema{
+			"kubeconfig_path": &schema.Schema{
 				Type:        schema.TypeString,
 				Description: `Kubeconfig path set after the the cluster is created.`,
 				Computed:    true,
