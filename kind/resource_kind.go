@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform/helper/schema"
 	clientcmd "k8s.io/client-go/tools/clientcmd"
 	kindDefaults "sigs.k8s.io/kind/pkg/apis/config/defaults"
 	"sigs.k8s.io/kind/pkg/cluster"
@@ -22,9 +22,11 @@ func resourceKindCreate(d *schema.ResourceData, meta interface{}) error {
 	nodeImage := d.Get("node_image").(string)
 	config := d.Get("kind_config").(string)
 
-	log.Println("=================== Creating Kind Cluster ==================")
 	var copts []cluster.CreateOption
-	copts = append(copts, cluster.CreateWithRawConfig([]byte(config)))
+	if config != "" {
+		copts = append(copts, cluster.CreateWithRawConfig([]byte(config)))
+	}
+
 	if nodeImage != "" {
 		copts = append(copts, cluster.CreateWithNodeImage(nodeImage))
 		log.Printf("Using defined node_image: %s\n", nodeImage)
@@ -33,6 +35,7 @@ func resourceKindCreate(d *schema.ResourceData, meta interface{}) error {
 		nodeImage = kindDefaults.Image
 	}
 
+	log.Println("=================== Creating Kind Cluster ==================")
 	provider := cluster.NewProvider(cluster.ProviderWithLogger(cmd.NewLogger()))
 	err := provider.Create(name, copts...)
 	if err != nil {

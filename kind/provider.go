@@ -3,7 +3,8 @@ package kind
 import (
 	"time"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/terraform"
 )
 
 const (
@@ -12,7 +13,7 @@ const (
 	defaultDeleteTimeout = time.Minute * 20
 )
 
-func Provider() *schema.Provider {
+func Provider() terraform.ResourceProvider {
 	return &schema.Provider{
 		ResourcesMap: map[string]*schema.Resource{
 			"kind": resourceKind(),
@@ -52,7 +53,6 @@ func resourceKind() *schema.Resource {
 				Description: `The kind_config that kind will use.`,
 				Optional:    true,
 				ForceNew:    true,
-				Computed:    true,
 			},
 			"kubeconfig": &schema.Schema{
 				Type:        schema.TypeString,
