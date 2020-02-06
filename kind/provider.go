@@ -3,7 +3,8 @@ package kind
 import (
 	"time"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/terraform"
 )
 
 const (
@@ -12,7 +13,7 @@ const (
 	defaultDeleteTimeout = time.Minute * 20
 )
 
-func Provider() *schema.Provider {
+func Provider() terraform.ResourceProvider {
 	return &schema.Provider{
 		ResourcesMap: map[string]*schema.Resource{
 			"kind": resourceKind(),
@@ -36,15 +37,26 @@ func resourceKind() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{
 				Type:        schema.TypeString,
-				Description: "The kind name that is given to the created cluster",
+				Description: "The kind name that is given to the created cluster.",
 				Required:    true,
 				ForceNew:    true,
 			},
 			"node_image": &schema.Schema{
 				Type:        schema.TypeString,
-				Description: `The node_image that kind will use (ex: kindest/node:v1.15.3)`,
+				Description: `The node_image that kind will use (ex: kindest/node:v1.15.3).`,
 				Optional:    true,
 				ForceNew:    true,
+				Computed:    true,
+			},
+			"kind_config": &schema.Schema{
+				Type:        schema.TypeString,
+				Description: `The kind_config that kind will use.`,
+				Optional:    true,
+				ForceNew:    true,
+			},
+			"kubeconfig": &schema.Schema{
+				Type:        schema.TypeString,
+				Description: `Kubeconfig set after the the cluster is created.`,
 				Computed:    true,
 			},
 			"kubeconfig_path": &schema.Schema{

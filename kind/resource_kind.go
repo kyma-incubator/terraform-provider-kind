@@ -3,12 +3,13 @@ package kind
 import (
 	"fmt"
 	"log"
+	"os"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform/helper/schema"
 	clientcmd "k8s.io/client-go/tools/clientcmd"
 	kindDefaults "sigs.k8s.io/kind/pkg/apis/config/defaults"
-	cluster "sigs.k8s.io/kind/pkg/cluster"
-	create "sigs.k8s.io/kind/pkg/cluster/create"
+	"sigs.k8s.io/kind/pkg/cluster"
+	"sigs.k8s.io/kind/pkg/cmd"
 )
 
 var (
@@ -18,46 +19,61 @@ var (
 func resourceKindCreate(d *schema.ResourceData, meta interface{}) error {
 	log.Println("Creating local Kubernetes cluster...")
 	name := d.Get("name").(string)
-	ctx := cluster.NewContext(name)
-	baseImage := d.Get("node_image").(string)
+	nodeImage := d.Get("node_image").(string)
+	config := d.Get("kind_config").(string)
 
-	log.Println("=================== Creating Kind Cluster ==================")
-	var opts []create.ClusterOption
-	opts = append(opts, create.SetupKubernetes(true))
-	if baseImage != "" {
-		opts = append(opts, create.WithNodeImage(baseImage))
-		log.Printf("Using defined base image: %s\n", baseImage)
-	} else {
-		d.Set("node_image", kindDefaults.Image) // set image to k/kind default image.
-		baseImage = kindDefaults.Image
+	var copts []cluster.CreateOption
+	if config != "" {
+		copts = append(copts, cluster.CreateWithRawConfig([]byte(config)))
 	}
 
-	err := ctx.Create(opts...)
+	if nodeImage != "" {
+		copts = append(copts, cluster.CreateWithNodeImage(nodeImage))
+		log.Printf("Using defined node_image: %s\n", nodeImage)
+	} else {
+		d.Set("node_image", kindDefaults.Image) // set image to k/kind default image.
+		nodeImage = kindDefaults.Image
+	}
+
+	log.Println("=================== Creating Kind Cluster ==================")
+	provider := cluster.NewProvider(cluster.ProviderWithLogger(cmd.NewLogger()))
+	err := provider.Create(name, copts...)
 	if err != nil {
 		return err
 	}
 
-	d.SetId(fmt.Sprintf("%s-%s", name, baseImage))
+	d.SetId(fmt.Sprintf("%s-%s", name, nodeImage))
 	return resourceKindRead(d, meta)
 }
 
 func resourceKindRead(d *schema.ResourceData, meta interface{}) error {
 	name := d.Get("name").(string)
-	ctx := cluster.NewContext(name)
+	provider := cluster.NewProvider(cluster.ProviderWithLogger(cmd.NewLogger()))
 	id := d.Id()
 	log.Printf("ID: %s\n", id)
 
-	err := ctx.Validate()
+	kconfig, err := provider.KubeConfig(name, true)
 	if err != nil {
 		d.SetId("")
 		return err
 	}
+	d.Set("kubeconfig", kconfig)
 
-	k8sKubeconfigPath := ctx.KubeConfigPath()
-	d.Set("k8s_kubeconfig_path", k8sKubeconfigPath)
+	currentPath, err := os.Getwd()
+	if err != nil {
+		d.SetId("")
+		return err
+	}
+	exportPath := fmt.Sprintf("%s%s%s-config", currentPath, string(os.PathSeparator), name)
+	err = provider.ExportKubeConfig(name, exportPath)
+	if err != nil {
+		d.SetId("")
+		return err
+	}
+	d.Set("kubeconfig_path", exportPath)
 
 	// use the current context in kubeconfig
-	config, err := clientcmd.BuildConfigFromFlags("", k8sKubeconfigPath)
+	config, err := clientcmd.RESTConfigFromKubeConfig([]byte(kconfig))
 	if err != nil {
 		return err
 	}
@@ -82,6 +98,9 @@ func resourceKindUpdate(d *schema.ResourceData, meta interface{}) error {
 	if d.HasChange("name") {
 		d.SetPartial("name")
 	}
+	if d.HasChange("kind_config") {
+		d.SetPartial("kind_config")
+	}
 
 	d.Partial(false)
 	return resourceKindRead(d, meta)
@@ -90,10 +109,11 @@ func resourceKindUpdate(d *schema.ResourceData, meta interface{}) error {
 func resourceKindDelete(d *schema.ResourceData, meta interface{}) error {
 	log.Println("Deleting local Kubernetes cluster...")
 	name := d.Get("name").(string)
-	ctx := cluster.NewContext(name)
+	kubeconfigPath := d.Get("kubeconfig_path").(string)
+	provider := cluster.NewProvider(cluster.ProviderWithLogger(cmd.NewLogger()))
 
 	log.Println("=================== Deleting Kind Cluster ==================")
-	err := ctx.Delete()
+	err := provider.Delete(name, kubeconfigPath)
 	if err != nil {
 		return err
 	}

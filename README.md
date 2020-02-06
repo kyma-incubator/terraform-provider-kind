@@ -33,25 +33,43 @@ Perform the following steps to use the provider:
     ```
 2. Edit the `main.tf` file and provide the following kind configuration:
 ```
-provider "kind" {
+provider "kind" {}
 
-}
-# creating a cluster with kind of the name "test-cluster" with kubernetes version v1.15.3 as is hardcoded in kind 0.5.1
+# creating a cluster with kind of the name "test-cluster" with kubernetes version hardcoded in kind defaults https://github.com/kubernetes-sigs/kind/blob/master/pkg/apis/config/defaults/image.go#L21
 resource "kind" "my-cluster" {
     name = "test-cluster"
 }
 ```
-To override the base image used, you can specify in addition the `node_image` like so:
-```
-provider "kind" {
 
-}
+To override the node image used, you can specify the `node_image` like so:
+```
+provider "kind" {}
+
 # creating a cluster with kind of the name "test-cluster" with kubernetes version v1.16.1
 resource "kind" "my-cluster" {
     name = "test-cluster"
     node_image = "kindest/node:v1.16.1"
 }
 ```
+
+To override the default kind config, you can specify the `kind_config` with HEREDOC:
+```
+provider "kind" {}
+
+# creating a cluster with kind of the name "test-cluster" with kubernetes version v1.15.7 and two nodes
+resource "kind" "my-cluster" {
+    name = "test-cluster"
+    node_image = "kindest/node:v1.15.7"
+    kind_config =<<KIONF
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+- role: control-plane
+- role: worker
+KIONF
+}
+```
+
 1. Initialize Terraform:
     ```bash
     terraform init
