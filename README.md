@@ -27,9 +27,9 @@ Perform the following steps to build the providers:
 
 Perform the following steps to use the provider:
 
-1. Go to the provider [example](https://github.com/kyma-incubator/terraform-provider-kind/tree/master/examples) folder:
+1. Go to the provider [example](https://github.com/kyma-incubator/terraform-provider-kind/tree/master/example) folder:
     ```bash
-    cd examples
+    cd example
     ```
 2. Edit the `main.tf` file and provide the following kind configuration:
 ```
