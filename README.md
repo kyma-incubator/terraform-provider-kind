@@ -32,7 +32,8 @@ Perform the following steps to use the provider:
     cd example
     ```
 2. Edit the `main.tf` file and provide the following kind configuration:
-```
+
+```hcl
 provider "kind" {}
 
 # creating a cluster with kind of the name "test-cluster" with kubernetes version hardcoded in kind defaults https://github.com/kubernetes-sigs/kind/blob/master/pkg/apis/config/defaults/image.go#L21
@@ -42,7 +43,8 @@ resource "kind" "my-cluster" {
 ```
 
 To override the node image used, you can specify the `node_image` like so:
-```
+
+```hcl
 provider "kind" {}
 
 # creating a cluster with kind of the name "test-cluster" with kubernetes version v1.16.1
@@ -53,7 +55,8 @@ resource "kind" "my-cluster" {
 ```
 
 To override the default kind config, you can specify the `kind_config` with HEREDOC:
-```
+
+```hcl
 provider "kind" {}
 
 # creating a cluster with kind of the name "test-cluster" with kubernetes version v1.15.7 and two nodes
