@@ -8,8 +8,8 @@ The Terraform Provider for kind enables [Terraform](https://www.terraform.io) to
 
 ## Prerequisites
 
-- [Terraform](https://www.terraform.io/downloads.html) 0.10+
-- [Go](https://golang.org/doc/install) 1.12 or higher
+- [Terraform](https://www.terraform.io/downloads.html) 0.12+
+- [Go](https://golang.org/doc/install) 1.13 or higher
 
 ## Development
 
@@ -59,10 +59,10 @@ To override the default kind config, you can specify the `kind_config` with HERE
 ```hcl
 provider "kind" {}
 
-# creating a cluster with kind of the name "test-cluster" with kubernetes version v1.15.7 and two nodes
+# creating a cluster with kind of the name "test-cluster" with kubernetes version v1.18.4 and two nodes
 resource "kind" "my-cluster" {
     name = "test-cluster"
-    node_image = "kindest/node:v1.15.7"
+    node_image = "kindest/node:v1.18.4"
     kind_config =<<KIONF
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
