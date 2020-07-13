@@ -8,9 +8,9 @@ import (
 )
 
 const (
-	defaultCreateTimeout = time.Minute * 30
-	defaultUpdateTimeout = time.Minute * 30
-	defaultDeleteTimeout = time.Minute * 20
+	defaultCreateTimeout = time.Minute * 5
+	defaultUpdateTimeout = time.Minute * 5
+	defaultDeleteTimeout = time.Minute * 5
 )
 
 func Provider() terraform.ResourceProvider {
@@ -20,4 +20,3 @@ func Provider() terraform.ResourceProvider {
 		},
 	}
 }
-

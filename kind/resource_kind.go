@@ -43,6 +43,13 @@ func resourceKind() *schema.Resource {
 				ForceNew:    true,
 				Computed:    true,
 			},
+			"wait_for_ready": &schema.Schema{
+				Type:        schema.TypeBool,
+				Description: `Defines wether or not the provider will wait for the control plane to be ready. Defaults to true`,
+				Default:     false,
+				ForceNew:    true, // TODO remove this once we have the update method defined.
+				Optional:    true,
+			},
 			"kind_config": &schema.Schema{
 				Type:        schema.TypeString,
 				Description: `The kind_config that kind will use.`,
@@ -88,6 +95,7 @@ func resourceKindCreate(d *schema.ResourceData, meta interface{}) error {
 	name := d.Get("name").(string)
 	nodeImage := d.Get("node_image").(string)
 	config := d.Get("kind_config").(string)
+	waitForReady := d.Get("wait_for_ready").(bool)
 
 	var copts []cluster.CreateOption
 	if config != "" {
@@ -100,6 +108,11 @@ func resourceKindCreate(d *schema.ResourceData, meta interface{}) error {
 	} else {
 		d.Set("node_image", kindDefaults.Image) // set image to k/kind default image.
 		nodeImage = kindDefaults.Image
+	}
+
+	if waitForReady {
+		copts = append(copts, cluster.CreateWithWaitForReady(defaultCreateTimeout))
+		log.Printf("Will wait for cluster nodes to report ready: %t\n", waitForReady)
 	}
 
 	log.Println("=================== Creating Kind Cluster ==================")
