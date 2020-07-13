@@ -2,7 +2,7 @@ provider "kind" {}
 
 resource "kind" "my-cluster" {
     name = "test-cluster"
-    node_image = "kindest/node:v1.15.3"
+    node_image = "kindest/node:v1.18.4"
     wait_for_ready = true
     kind_config =<<KIONF
 kind: Cluster
