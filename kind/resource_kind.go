@@ -45,7 +45,7 @@ func resourceKind() *schema.Resource {
 			},
 			"wait_for_ready": &schema.Schema{
 				Type:        schema.TypeBool,
-				Description: `Defines wether or not the provider will wait for the control plane to be ready. Defaults to true`,
+				Description: `Defines wether or not the provider will wait for the control plane to be ready. Defaults to false`,
 				Default:     false,
 				ForceNew:    true, // TODO remove this once we have the update method defined.
 				Optional:    true,
