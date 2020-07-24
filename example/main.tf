@@ -1,6 +1,6 @@
 provider "kind" {}
 
-resource "kind" "my-cluster" {
+resource "kind_cluster" "default" {
     name = "test-cluster"
     node_image = "kindest/node:v1.18.4"
     wait_for_ready = true
