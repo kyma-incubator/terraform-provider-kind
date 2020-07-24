@@ -15,5 +15,8 @@ ci-release: build
 clean:
 	rm -rf bin
 
+ci-testacc:
+	./before-commit.sh ci testacc
+
 testacc:
 	./before-commit.sh testacc
