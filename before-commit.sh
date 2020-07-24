@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 readonly CI_FLAG=ci
+readonly TEST_ACC_FLAG=testacc
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -75,6 +76,14 @@ else echo -e "${GREEN}√ go test${NC}"
 fi
 
 goFilesToCheck=$(find . -type f -name "*.go" | egrep -v "\/vendor\/|_*/automock/|_*/testdata/|_*export_test.go")
+
+##
+# TF ACCEPTANCE TESTS
+##
+if [ "$1" == "$TEST_ACC_FLAG" ]; then
+	# run terraform acceptance tests
+	TF_ACC=1 go test ./kind -v -count 1 -parallel 20 -timeout 120m
+fi
 
 #
 # GO FMT

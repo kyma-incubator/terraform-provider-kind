@@ -14,3 +14,6 @@ ci-release: build
 .PHONY: clean
 clean:
 	rm -rf bin
+
+testacc:
+	./before-commit.sh testacc

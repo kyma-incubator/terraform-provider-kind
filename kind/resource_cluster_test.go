@@ -79,7 +79,7 @@ func testAccSimpleCluster(name string) resource.TestCheckFunc {
 
 func testAccSimpleClusterConfig(name string) string {
 	return fmt.Sprintf(`
-resource "cluster" "test" {
+resource "kind_cluster" "test" {
   name = "%s"
   node_image = "kindest/node:v1.18.4"
 }
