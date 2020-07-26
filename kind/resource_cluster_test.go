@@ -42,26 +42,28 @@ func TestAccCluster(t *testing.T) {
 					resource.TestCheckNoResourceAttr(resourceName, "kind_config"),
 				),
 			},
-			{
-				ResourceName:      resourceName,
-				ImportState:       true,
-				ImportStateVerify: true,
-			},
+			// TODO: add this for when resource update is implemented
+			// {
+			// 	ResourceName:      resourceName,
+			// 	ImportState:       true,
+			// 	ImportStateVerify: true,
+			// },
 		},
 	})
 }
 
+// TODO: check if this makes sense for kind
 // testAccCheckKindClusterResourceDestroy verifies the kind cluster
 // has been destroyed
 func testAccCheckKindClusterResourceDestroy(s *terraform.State) error {
 	// retrieve the connection established in Provider configuration
 	// conn := testAccProvider.Meta().(*Kind)
 
-	// loop through the resources in state, verifying each widget
+	// loop through the resources in state, verifying each
 	// is destroyed
-	for _, rs := range s.RootModule().Resources {
-		panic(rs)
-	}
+	// for _, rs := range s.RootModule().Resources {
+	// 	fmt.Println(rs)
+	// }
 
 	return nil
 }
