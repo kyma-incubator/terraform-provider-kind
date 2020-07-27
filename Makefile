@@ -1,5 +1,9 @@
 .PHONY: build
 build: 
+	./before-commit.sh
+
+.PHONY: ci-build
+ci-build:
 	./before-commit.sh ci
 
 .PHONY: ci-pr
