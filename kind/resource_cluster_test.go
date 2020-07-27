@@ -8,6 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 	kindDefaults "sigs.k8s.io/kind/pkg/apis/config/defaults"
+	"sigs.k8s.io/kind/pkg/cluster"
 )
 
 func init() {
@@ -31,12 +32,12 @@ func TestAccCluster(t *testing.T) {
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckKindClusterResourceDestroy,
+		CheckDestroy: testAccCheckKindClusterResourceDestroy(clusterName),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccBasicClusterConfig(clusterName),
 				Check: resource.ComposeTestCheckFunc(
-					testAccSimpleCluster(resourceName),
+					testAccCheckClusterCreate(resourceName),
 					resource.TestCheckResourceAttr(resourceName, "name", clusterName),
 					resource.TestCheckResourceAttr(resourceName, "node_image", kindDefaults.Image),
 					resource.TestCheckResourceAttr(resourceName, "wait_for_ready", "false"),
@@ -46,7 +47,7 @@ func TestAccCluster(t *testing.T) {
 			{
 				Config: testAccBasicWaitForReadyClusterConfig(clusterName),
 				Check: resource.ComposeTestCheckFunc(
-					testAccSimpleCluster(resourceName),
+					testAccCheckClusterCreate(resourceName),
 					resource.TestCheckResourceAttr(resourceName, "name", clusterName),
 					resource.TestCheckResourceAttr(resourceName, "node_image", kindDefaults.Image),
 					resource.TestCheckResourceAttr(resourceName, "wait_for_ready", "true"),
@@ -56,7 +57,7 @@ func TestAccCluster(t *testing.T) {
 			{
 				Config: testAccBasicExtraConfigClusterConfig(clusterName),
 				Check: resource.ComposeTestCheckFunc(
-					testAccSimpleCluster(resourceName),
+					testAccCheckClusterCreate(resourceName),
 					resource.TestCheckResourceAttr(resourceName, "name", clusterName),
 					resource.TestCheckResourceAttr(resourceName, "node_image", kindDefaults.Image),
 					resource.TestCheckResourceAttr(resourceName, "wait_for_ready", "false"),
@@ -71,7 +72,7 @@ nodes:
 			{
 				Config: testAccBasicWaitForReadyExtraConfigClusterConfig(clusterName),
 				Check: resource.ComposeTestCheckFunc(
-					testAccSimpleCluster(resourceName),
+					testAccCheckClusterCreate(resourceName),
 					resource.TestCheckResourceAttr(resourceName, "name", clusterName),
 					resource.TestCheckResourceAttr(resourceName, "node_image", kindDefaults.Image),
 					resource.TestCheckResourceAttr(resourceName, "wait_for_ready", "true"),
@@ -86,7 +87,7 @@ nodes:
 			{
 				Config: testAccNodeImageClusterConfig(clusterName),
 				Check: resource.ComposeTestCheckFunc(
-					testAccSimpleCluster(resourceName),
+					testAccCheckClusterCreate(resourceName),
 					resource.TestCheckResourceAttr(resourceName, "name", clusterName),
 					resource.TestCheckResourceAttr(resourceName, "node_image", nodeImage),
 					resource.TestCheckResourceAttr(resourceName, "wait_for_ready", "false"),
@@ -96,7 +97,7 @@ nodes:
 			{
 				Config: testAccNodeImageWaitForReadyClusterConfig(clusterName),
 				Check: resource.ComposeTestCheckFunc(
-					testAccSimpleCluster(resourceName),
+					testAccCheckClusterCreate(resourceName),
 					resource.TestCheckResourceAttr(resourceName, "name", clusterName),
 					resource.TestCheckResourceAttr(resourceName, "node_image", nodeImage),
 					resource.TestCheckResourceAttr(resourceName, "wait_for_ready", "true"),
@@ -106,7 +107,7 @@ nodes:
 			{
 				Config: testAccNodeImageExtraConfigClusterConfig(clusterName),
 				Check: resource.ComposeTestCheckFunc(
-					testAccSimpleCluster(resourceName),
+					testAccCheckClusterCreate(resourceName),
 					resource.TestCheckResourceAttr(resourceName, "name", clusterName),
 					resource.TestCheckResourceAttr(resourceName, "node_image", nodeImage),
 					resource.TestCheckResourceAttr(resourceName, "wait_for_ready", "false"),
@@ -121,7 +122,7 @@ nodes:
 			{
 				Config: testAccNodeImageWaitForReadyExtraConfigClusterConfig(clusterName),
 				Check: resource.ComposeTestCheckFunc(
-					testAccSimpleCluster(resourceName),
+					testAccCheckClusterCreate(resourceName),
 					resource.TestCheckResourceAttr(resourceName, "name", clusterName),
 					resource.TestCheckResourceAttr(resourceName, "node_image", nodeImage),
 					resource.TestCheckResourceAttr(resourceName, "wait_for_ready", "true"),
@@ -143,23 +144,26 @@ nodes:
 	})
 }
 
-// TODO: check if this makes sense for kind
 // testAccCheckKindClusterResourceDestroy verifies the kind cluster
 // has been destroyed
-func testAccCheckKindClusterResourceDestroy(s *terraform.State) error {
-	// retrieve the connection established in Provider configuration
-	// conn := testAccProvider.Meta().(*Kind)
+func testAccCheckKindClusterResourceDestroy(clusterName string) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		prov := cluster.NewProvider()
+		list, err := prov.List()
+		if err != nil {
+			return fmt.Errorf("cannot get kind provider cluster list")
+		}
+		for _, c := range list {
+			if c == clusterName {
+				return fmt.Errorf("list cannot contain cluster of name %s", clusterName)
+			}
+		}
 
-	// loop through the resources in state, verifying each
-	// is destroyed
-	// for _, rs := range s.RootModule().Resources {
-	// 	fmt.Println(rs)
-	// }
-
-	return nil
+		return nil
+	}
 }
 
-func testAccSimpleCluster(name string) resource.TestCheckFunc {
+func testAccCheckClusterCreate(name string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		_, ok := s.RootModule().Resources[name]
 		if !ok {
