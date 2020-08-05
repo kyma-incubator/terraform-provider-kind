@@ -5,23 +5,19 @@ import (
 	"log"
 	"os"
 
-	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	clientcmd "k8s.io/client-go/tools/clientcmd"
 	kindDefaults "sigs.k8s.io/kind/pkg/apis/config/defaults"
 	"sigs.k8s.io/kind/pkg/cluster"
 	"sigs.k8s.io/kind/pkg/cmd"
 )
 
-var (
-	profile string = "kind"
-)
-
-func resourceKind() *schema.Resource {
+func resourceCluster() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceKindCreate,
-		Read:   resourceKindRead,
-		// Update: resourceKindUpdate,
-		Delete: resourceKindDelete,
+		Create: resourceKindClusterCreate,
+		Read:   resourceKindClusterRead,
+		// Update: resourceKindClusterUpdate,
+		Delete: resourceKindClusterDelete,
 
 		Timeouts: &schema.ResourceTimeout{
 			Create: schema.DefaultTimeout(defaultCreateTimeout),
@@ -30,58 +26,58 @@ func resourceKind() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
+			"name": {
 				Type:        schema.TypeString,
 				Description: "The kind name that is given to the created cluster.",
 				Required:    true,
 				ForceNew:    true,
 			},
-			"node_image": &schema.Schema{
+			"node_image": {
 				Type:        schema.TypeString,
 				Description: `The node_image that kind will use (ex: kindest/node:v1.15.3).`,
 				Optional:    true,
 				ForceNew:    true,
 				Computed:    true,
 			},
-			"wait_for_ready": &schema.Schema{
+			"wait_for_ready": {
 				Type:        schema.TypeBool,
 				Description: `Defines wether or not the provider will wait for the control plane to be ready. Defaults to false`,
 				Default:     false,
 				ForceNew:    true, // TODO remove this once we have the update method defined.
 				Optional:    true,
 			},
-			"kind_config": &schema.Schema{
+			"kind_config": {
 				Type:        schema.TypeString,
 				Description: `The kind_config that kind will use.`,
 				Optional:    true,
 				ForceNew:    true,
 			},
-			"kubeconfig": &schema.Schema{
+			"kubeconfig": {
 				Type:        schema.TypeString,
 				Description: `Kubeconfig set after the the cluster is created.`,
 				Computed:    true,
 			},
-			"kubeconfig_path": &schema.Schema{
+			"kubeconfig_path": {
 				Type:        schema.TypeString,
 				Description: `Kubeconfig path set after the the cluster is created.`,
 				Computed:    true,
 			},
-			"client_certificate": &schema.Schema{
+			"client_certificate": {
 				Type:        schema.TypeString,
 				Description: `Client certificate for authenticating to cluster.`,
 				Computed:    true,
 			},
-			"client_key": &schema.Schema{
+			"client_key": {
 				Type:        schema.TypeString,
 				Description: `Client key for authenticating to cluster.`,
 				Computed:    true,
 			},
-			"cluster_ca_certificate": &schema.Schema{
+			"cluster_ca_certificate": {
 				Type:        schema.TypeString,
 				Description: `Client verifies the server certificate with this CA cert.`,
 				Computed:    true,
 			},
-			"endpoint": &schema.Schema{
+			"endpoint": {
 				Type:        schema.TypeString,
 				Description: `Kubernetes APIServer endpoint.`,
 				Computed:    true,
@@ -90,7 +86,7 @@ func resourceKind() *schema.Resource {
 	}
 }
 
-func resourceKindCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceKindClusterCreate(d *schema.ResourceData, meta interface{}) error {
 	log.Println("Creating local Kubernetes cluster...")
 	name := d.Get("name").(string)
 	nodeImage := d.Get("node_image").(string)
@@ -123,10 +119,10 @@ func resourceKindCreate(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	d.SetId(fmt.Sprintf("%s-%s", name, nodeImage))
-	return resourceKindRead(d, meta)
+	return resourceKindClusterRead(d, meta)
 }
 
-func resourceKindRead(d *schema.ResourceData, meta interface{}) error {
+func resourceKindClusterRead(d *schema.ResourceData, meta interface{}) error {
 	name := d.Get("name").(string)
 	provider := cluster.NewProvider(cluster.ProviderWithLogger(cmd.NewLogger()))
 	id := d.Id()
@@ -168,7 +164,7 @@ func resourceKindRead(d *schema.ResourceData, meta interface{}) error {
 	return nil
 }
 
-func resourceKindUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceKindClusterUpdate(d *schema.ResourceData, meta interface{}) error {
 	log.Println("")
 	d.Partial(true)
 
@@ -183,10 +179,10 @@ func resourceKindUpdate(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	d.Partial(false)
-	return resourceKindRead(d, meta)
+	return resourceKindClusterRead(d, meta)
 }
 
-func resourceKindDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceKindClusterDelete(d *schema.ResourceData, meta interface{}) error {
 	log.Println("Deleting local Kubernetes cluster...")
 	name := d.Get("name").(string)
 	kubeconfigPath := d.Get("kubeconfig_path").(string)

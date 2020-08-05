@@ -6,82 +6,19 @@
 
 The Terraform Provider for kind enables [Terraform](https://www.terraform.io) to provision local [Kubernetes](https://kubernetes.io) clusters on base of [Kubernetes IN Docker (kind)](https://github.com/kubernetes-sigs/kind).
 
-## Prerequisites
+## Quick Starts
+- [Using the provider](./docs/USAGE.md)
+- [Provider development](./docs/DEVELOPMENT.md)
 
-- [Terraform](https://www.terraform.io/downloads.html) 0.12+
-- [Go](https://golang.org/doc/install) 1.13 or higher
+## Example Usage
 
-## Development
-
-Perform the following steps to build the providers:
-
-1. Build the provider:
-    ```bash
-    go build -o terraform-provider-kind
-    ```
-2. Move the provider binary into the terraform plugins folder.
-
-    >**NOTE**: For details on Terraform plugins see [this](https://www.terraform.io/docs/plugins/basics.html#installing-plugins) document.
-
-## Usage
-
-Perform the following steps to use the provider:
-
-1. Go to the provider [example](https://github.com/kyma-incubator/terraform-provider-kind/tree/master/example) folder:
-    ```bash
-    cd example
-    ```
-2. Edit the `main.tf` file and provide the following kind configuration:
-
+Copy the following code into a file with the extension `.tf` to create a kind cluster with only default values.
 ```hcl
 provider "kind" {}
 
-# creating a cluster with kind of the name "test-cluster" with kubernetes version hardcoded in kind defaults https://github.com/kubernetes-sigs/kind/blob/master/pkg/apis/config/defaults/image.go#L21
-resource "kind" "my-cluster" {
+resource "kind_cluster" "default" {
     name = "test-cluster"
 }
 ```
 
-To override the node image used, you can specify the `node_image` like so:
-
-```hcl
-provider "kind" {}
-
-# creating a cluster with kind of the name "test-cluster" with kubernetes version v1.16.1
-resource "kind" "my-cluster" {
-    name = "test-cluster"
-    node_image = "kindest/node:v1.16.1"
-}
-```
-
-To override the default kind config, you can specify the `kind_config` with HEREDOC:
-
-```hcl
-provider "kind" {}
-
-# creating a cluster with kind of the name "test-cluster" with kubernetes version v1.18.4 and two nodes
-resource "kind" "my-cluster" {
-    name = "test-cluster"
-    node_image = "kindest/node:v1.18.4"
-    kind_config =<<KIONF
-kind: Cluster
-apiVersion: kind.x-k8s.io/v1alpha4
-nodes:
-- role: control-plane
-- role: worker
-KIONF
-}
-```
-
-1. Initialize Terraform:
-    ```bash
-    terraform init
-    ```
-2. Plan the provisioning:
-    ```bash
-    terraform plan
-    ```
-3. Deploy the cluster:
-    ```bash
-    terraform apply
-    ```
+Then run `terraform init`, `terraform plan` & `terraform apply` and follow the on screen instructions. For more details on how to influence creation of the kind resource check out the Quick Start section above.
