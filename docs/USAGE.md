@@ -8,47 +8,8 @@ Perform the following steps to use the provider:
     ```bash
     cd example
     ```
-2. Edit the `main.tf` file and provide the following kind configuration:
+2. Edit the `main.tf` file and change the config as needed.
 
-```hcl
-provider "kind" {}
-
-# creating a cluster with kind of the name "test-cluster" with kubernetes version hardcoded in kind defaults https://github.com/kubernetes-sigs/kind/blob/master/pkg/apis/config/defaults/image.go#L21
-resource "kind_cluster" "default" {
-    name = "test-cluster"
-}
-```
-
-To override the node image used, you can specify the `node_image` like so:
-
-```hcl
-provider "kind" {}
-
-# creating a cluster with kind of the name "test-cluster" with kubernetes version v1.16.1
-resource "kind_cluster" "default" {
-    name = "test-cluster"
-    node_image = "kindest/node:v1.16.1"
-}
-```
-
-To override the default kind config, you can specify the `kind_config` with HEREDOC:
-
-```hcl
-provider "kind" {}
-
-# creating a cluster with kind of the name "test-cluster" with kubernetes version v1.18.4 and two nodes
-resource "kind_cluster" "default" {
-    name = "test-cluster"
-    node_image = "kindest/node:v1.18.4"
-    kind_config =<<KIONF
-kind: Cluster
-apiVersion: kind.x-k8s.io/v1alpha4
-nodes:
-- role: control-plane
-- role: worker
-KIONF
-}
-```
 
 1. Initialize Terraform:
     ```bash
