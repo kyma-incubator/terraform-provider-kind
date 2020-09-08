@@ -128,7 +128,7 @@ func resourceKindClusterRead(d *schema.ResourceData, meta interface{}) error {
 	id := d.Id()
 	log.Printf("ID: %s\n", id)
 
-	kconfig, err := provider.KubeConfig(name, true)
+	kconfig, err := provider.KubeConfig(name, false)
 	if err != nil {
 		d.SetId("")
 		return err
