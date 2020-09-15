@@ -13,7 +13,7 @@ require (
 	golang.org/x/crypto v0.0.0-20200510223506-06a226fb4e37 // indirect
 	k8s.io/client-go v12.0.0+incompatible
 	k8s.io/utils v0.0.0-20200619165400-6e3d28b6ed19 // indirect
-	sigs.k8s.io/kind v0.8.1
+	sigs.k8s.io/kind v0.9.0
 )
 
 replace k8s.io/client-go => k8s.io/client-go v0.18.5
