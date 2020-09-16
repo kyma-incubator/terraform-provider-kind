@@ -47,10 +47,11 @@ func resourceCluster() *schema.Resource {
 				Optional:    true,
 			},
 			"kind_config": {
-				Type:        schema.TypeMap,
+				Type:        schema.TypeList,
 				Description: `The kind_config that kind will use to bootstrap the cluster.`,
 				Optional:    true,
 				ForceNew:    true,
+				MaxItems:    1,
 				Elem: &schema.Resource{
 					Schema: kindConfigFields(),
 				},
@@ -98,9 +99,11 @@ func resourceKindClusterCreate(d *schema.ResourceData, meta interface{}) error {
 
 	var copts []cluster.CreateOption
 
-	if config != "" {
-		opts := flattenKindConfig(config.(*schema.ResourceData))
-		copts = append(copts, cluster.CreateWithV1Alpha4Config(opts))
+	if config != nil {
+		if data, ok := config.([]interface{})[0].(map[string]interface{}); ok {
+			opts := flattenKindConfig(data)
+			copts = append(copts, cluster.CreateWithV1Alpha4Config(opts))
+		}
 	}
 
 	if nodeImage != "" {

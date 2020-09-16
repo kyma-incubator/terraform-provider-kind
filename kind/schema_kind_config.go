@@ -21,7 +21,6 @@ func kindConfigFields() map[string]*schema.Schema {
 		"nodes": {
 			Type:     schema.TypeList,
 			Optional: true,
-			MaxItems: 1,
 			Elem: &schema.Resource{
 				Schema: kindConfigNodeFields(),
 			},
