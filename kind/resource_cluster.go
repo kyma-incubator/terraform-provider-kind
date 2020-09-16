@@ -47,10 +47,13 @@ func resourceCluster() *schema.Resource {
 				Optional:    true,
 			},
 			"kind_config": {
-				Type:        schema.TypeString,
-				Description: `The kind_config that kind will use.`,
+				Type:        schema.TypeMap,
+				Description: `The kind_config that kind will use to bootstrap the cluster.`,
 				Optional:    true,
 				ForceNew:    true,
+				Elem: &schema.Resource{
+					Schema: kindConfigFields(),
+				},
 			},
 			"kubeconfig": {
 				Type:        schema.TypeString,
@@ -90,12 +93,14 @@ func resourceKindClusterCreate(d *schema.ResourceData, meta interface{}) error {
 	log.Println("Creating local Kubernetes cluster...")
 	name := d.Get("name").(string)
 	nodeImage := d.Get("node_image").(string)
-	config := d.Get("kind_config").(string)
+	config := d.Get("kind_config")
 	waitForReady := d.Get("wait_for_ready").(bool)
 
 	var copts []cluster.CreateOption
+
 	if config != "" {
-		copts = append(copts, cluster.CreateWithRawConfig([]byte(config)))
+		opts := flattenKindConfig(config.(*schema.ResourceData))
+		copts = append(copts, cluster.CreateWithV1Alpha4Config(opts))
 	}
 
 	if nodeImage != "" {
