@@ -7,7 +7,6 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	clientcmd "k8s.io/client-go/tools/clientcmd"
-	kindDefaults "sigs.k8s.io/kind/pkg/apis/config/defaults"
 	"sigs.k8s.io/kind/pkg/cluster"
 	"sigs.k8s.io/kind/pkg/cmd"
 )
@@ -100,18 +99,18 @@ func resourceKindClusterCreate(d *schema.ResourceData, meta interface{}) error {
 	var copts []cluster.CreateOption
 
 	if config != nil {
-		if data, ok := config.([]interface{})[0].(map[string]interface{}); ok {
-			opts := flattenKindConfig(data)
-			copts = append(copts, cluster.CreateWithV1Alpha4Config(opts))
+		cfg := config.([]interface{})
+		if len(cfg) == 1 { // there is always just one kind_config allowed
+			if data, ok := cfg[0].(map[string]interface{}); ok {
+				opts := flattenKindConfig(data)
+				copts = append(copts, cluster.CreateWithV1Alpha4Config(opts))
+			}
 		}
 	}
 
 	if nodeImage != "" {
 		copts = append(copts, cluster.CreateWithNodeImage(nodeImage))
 		log.Printf("Using defined node_image: %s\n", nodeImage)
-	} else {
-		d.Set("node_image", kindDefaults.Image) // set image to k/kind default image.
-		nodeImage = kindDefaults.Image
 	}
 
 	if waitForReady {
