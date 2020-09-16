@@ -12,9 +12,9 @@ func flattenKindConfig(d map[string]interface{}) *v1alpha4.Cluster {
 	obj.Kind = mapKeyIfExists(d, "kind").(string)
 	obj.APIVersion = mapKeyIfExists(d, "api_version").(string)
 
-	nodes := mapKeyIfExists(d, "nodes").([]interface{})
+	nodes := mapKeyIfExists(d, "nodes")
 	if nodes != nil {
-		for _, n := range nodes {
+		for _, n := range nodes.([]interface{}) {
 			data := n.(map[string]interface{})
 			obj.Nodes = append(obj.Nodes, flattenKindConfigNodes(data))
 		}
@@ -26,39 +26,39 @@ func flattenKindConfig(d map[string]interface{}) *v1alpha4.Cluster {
 func flattenKindConfigNodes(d map[string]interface{}) v1alpha4.Node {
 	obj := v1alpha4.Node{}
 
-	role := mapKeyIfExists(d, "role").(string)
-	if role != "" {
-		switch role {
+	role := mapKeyIfExists(d, "role")
+	if role != nil && role.(string) != "" {
+		switch role.(string) {
 		case string(v1alpha4.ControlPlaneRole):
 			obj.Role = v1alpha4.ControlPlaneRole
 		case string(v1alpha4.WorkerRole):
 			obj.Role = v1alpha4.WorkerRole
 		}
 	}
-	image := mapKeyIfExists(d, "image").(string)
-	if image != "" {
-		obj.Image = image
+	image := mapKeyIfExists(d, "image")
+	if image != nil && image.(string) != "" {
+		obj.Image = image.(string)
 	}
 
-	extraMounts := mapKeyIfExists(d, "extra_mounts").([]interface{})
+	extraMounts := mapKeyIfExists(d, "extra_mounts")
 	if extraMounts != nil {
-		for _, m := range extraMounts {
+		for _, m := range extraMounts.([]interface{}) {
 			data := m.(map[string]interface{})
 			obj.ExtraMounts = append(obj.ExtraMounts, flattenKindConfigExtraMounts(data))
 		}
 	}
 
-	extraPortMappings := mapKeyIfExists(d, "extra_port_mappings").([]interface{})
+	extraPortMappings := mapKeyIfExists(d, "extra_port_mappings")
 	if extraPortMappings != nil {
-		for _, m := range extraPortMappings {
+		for _, m := range extraPortMappings.([]interface{}) {
 			data := m.(map[string]interface{})
 			obj.ExtraPortMappings = append(obj.ExtraPortMappings, flattenKindConfigExtraPortMappings(data))
 		}
 	}
 
-	kubeadmConfigPatches := mapKeyIfExists(d, "kubeadm_config_patches").([]interface{})
+	kubeadmConfigPatches := mapKeyIfExists(d, "kubeadm_config_patches")
 	if kubeadmConfigPatches != nil {
-		for _, k := range kubeadmConfigPatches {
+		for _, k := range kubeadmConfigPatches.([]interface{}) {
 			data := k.(string)
 			obj.KubeadmConfigPatches = append(obj.KubeadmConfigPatches, data)
 		}
@@ -70,17 +70,17 @@ func flattenKindConfigNodes(d map[string]interface{}) v1alpha4.Node {
 func flattenKindConfigExtraMounts(d map[string]interface{}) v1alpha4.Mount {
 	obj := v1alpha4.Mount{}
 
-	containerPath := mapKeyIfExists(d, "container_path").(string)
-	if containerPath != "" {
-		obj.ContainerPath = containerPath
+	containerPath := mapKeyIfExists(d, "container_path")
+	if containerPath != nil && containerPath.(string) != "" {
+		obj.ContainerPath = containerPath.(string)
 	}
-	hostPath := mapKeyIfExists(d, "host_path").(string)
-	if hostPath != "" {
-		obj.HostPath = hostPath
+	hostPath := mapKeyIfExists(d, "host_path")
+	if hostPath != nil && hostPath.(string) != "" {
+		obj.HostPath = hostPath.(string)
 	}
-	propagation := mapKeyIfExists(d, "propagation").(string)
-	if propagation != "" {
-		switch propagation {
+	propagation := mapKeyIfExists(d, "propagation")
+	if propagation != nil && propagation.(string) != "" {
+		switch propagation.(string) {
 		case string(v1alpha4.MountPropagationBidirectional):
 			obj.Propagation = v1alpha4.MountPropagationBidirectional
 		case string(v1alpha4.MountPropagationHostToContainer):
@@ -90,13 +90,13 @@ func flattenKindConfigExtraMounts(d map[string]interface{}) v1alpha4.Mount {
 		}
 	}
 
-	readonly := mapKeyIfExists(d, "readonly").(bool)
-	if hostPath != "" {
-		obj.Readonly = readonly
+	readonly := mapKeyIfExists(d, "readonly")
+	if readonly != nil {
+		obj.Readonly = readonly.(bool)
 	}
-	selinuxRelabel := mapKeyIfExists(d, "selinux_relabel").(bool)
-	if hostPath != "" {
-		obj.SelinuxRelabel = selinuxRelabel
+	selinuxRelabel := mapKeyIfExists(d, "selinux_relabel")
+	if selinuxRelabel != nil {
+		obj.SelinuxRelabel = selinuxRelabel.(bool)
 	}
 
 	return obj
@@ -113,18 +113,18 @@ func flattenKindConfigExtraPortMappings(d map[string]interface{}) v1alpha4.PortM
 	if hostPort != nil {
 		obj.HostPort = hostPort.(int32)
 	}
-	listenAddress := mapKeyIfExists(d, "listen_address").(string)
-	if listenAddress != "" {
-		obj.ListenAddress = listenAddress
+	listenAddress := mapKeyIfExists(d, "listen_address")
+	if listenAddress != nil && listenAddress.(string) != "" {
+		obj.ListenAddress = listenAddress.(string)
 	}
 	protocol := mapKeyIfExists(d, "protocol")
-	if protocol != nil {
-		switch protocol {
-		case v1alpha4.PortMappingProtocolSCTP:
+	if protocol != nil && protocol.(string) != "" {
+		switch protocol.(string) {
+		case string(v1alpha4.PortMappingProtocolSCTP):
 			obj.Protocol = v1alpha4.PortMappingProtocolSCTP
-		case v1alpha4.PortMappingProtocolTCP:
+		case string(v1alpha4.PortMappingProtocolTCP):
 			obj.Protocol = v1alpha4.PortMappingProtocolTCP
-		case v1alpha4.PortMappingProtocolUDP:
+		case string(v1alpha4.PortMappingProtocolUDP):
 			obj.Protocol = v1alpha4.PortMappingProtocolUDP
 		}
 	}
