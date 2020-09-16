@@ -7,12 +7,12 @@ resource "kind_cluster" "default" {
   wait_for_ready = true
   kind_config = {
     kind       = "Cluster"
-    apiVersion = "kind.x-k8s.io/v1alpha4"
+    api_version = "kind.x-k8s.io/v1alpha4"
     nodes = {
-      "role" = "control-plane"
+      role = "control-plane"
     }
     nodes = {
-      "role" = "worker"
+      role = "worker"
     }
   }
 }

@@ -11,7 +11,7 @@ func flattenKindConfig(d *schema.ResourceData) *v1alpha4.Cluster {
 	obj := &v1alpha4.Cluster{}
 
 	obj.Kind = d.Get("kind").(string)
-	obj.APIVersion = d.Get("apiVersion").(string)
+	obj.APIVersion = d.Get("api_version").(string)
 
 	nodes := d.Get("nodes").([]interface{})
 	if nodes != nil {
@@ -35,21 +35,21 @@ func flattenKindConfigNodes(d *schema.ResourceData) v1alpha4.Node {
 		obj.Image = image
 	}
 
-	extraMounts := d.Get("extraMounts").([]interface{})
+	extraMounts := d.Get("extra_mounts").([]interface{})
 	if extraMounts != nil {
 		for _, m := range extraMounts {
 			obj.ExtraMounts = append(obj.ExtraMounts, flattenKindConfigExtraMounts(m.(*schema.ResourceData)))
 		}
 	}
 
-	extraPortMappings := d.Get("extraPortMappings").([]interface{})
+	extraPortMappings := d.Get("extra_port_mappings").([]interface{})
 	if extraPortMappings != nil {
 		for _, m := range extraPortMappings {
 			obj.ExtraPortMappings = append(obj.ExtraPortMappings, flattenKindConfigExtraPortMappings(m.(*schema.ResourceData)))
 		}
 	}
 
-	kubeadmConfigPatches := d.Get("kubeadmConfigPatches").([]string)
+	kubeadmConfigPatches := d.Get("kubeadm_config_patches").([]string)
 	if kubeadmConfigPatches != nil {
 		for _, k := range kubeadmConfigPatches {
 			obj.KubeadmConfigPatches = append(obj.KubeadmConfigPatches, k)
@@ -62,11 +62,11 @@ func flattenKindConfigNodes(d *schema.ResourceData) v1alpha4.Node {
 func flattenKindConfigExtraMounts(d *schema.ResourceData) v1alpha4.Mount {
 	obj := v1alpha4.Mount{}
 
-	containerPath := d.Get("containerPath").(string)
+	containerPath := d.Get("container_path").(string)
 	if containerPath != "" {
 		obj.ContainerPath = containerPath
 	}
-	hostPath := d.Get("hostPath").(string)
+	hostPath := d.Get("host_path").(string)
 	if hostPath != "" {
 		obj.HostPath = hostPath
 	}
@@ -79,7 +79,7 @@ func flattenKindConfigExtraMounts(d *schema.ResourceData) v1alpha4.Mount {
 	if hostPath != "" {
 		obj.Readonly = readonly
 	}
-	selinuxRelabel := d.Get("selinuxRelabel").(bool)
+	selinuxRelabel := d.Get("selinux_relabel").(bool)
 	if hostPath != "" {
 		obj.SelinuxRelabel = selinuxRelabel
 	}
@@ -90,15 +90,15 @@ func flattenKindConfigExtraMounts(d *schema.ResourceData) v1alpha4.Mount {
 func flattenKindConfigExtraPortMappings(d *schema.ResourceData) v1alpha4.PortMapping {
 	obj := v1alpha4.PortMapping{}
 
-	containerPort := d.Get("containerPort")
+	containerPort := d.Get("container_port")
 	if containerPort != nil {
 		obj.ContainerPort = containerPort.(int32)
 	}
-	hostPort := d.Get("hostPort")
+	hostPort := d.Get("host_port")
 	if hostPort != nil {
 		obj.HostPort = hostPort.(int32)
 	}
-	listenAddress := d.Get("listenAddress").(string)
+	listenAddress := d.Get("listen_address").(string)
 	if listenAddress != "" {
 		obj.ListenAddress = listenAddress
 	}
