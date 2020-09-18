@@ -30,7 +30,7 @@ func TestAccCluster(t *testing.T) {
 	resourceName := "kind_cluster.test"
 	clusterName := acctest.RandomWithPrefix("tf-acc-cluster-test")
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckKindClusterResourceDestroy(clusterName),
@@ -89,7 +89,7 @@ func TestAccClusterConfigBase(t *testing.T) {
 	resourceName := "kind_cluster.test"
 	clusterName := acctest.RandomWithPrefix("tf-acc-config-base-test")
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckKindClusterResourceDestroy(clusterName),
@@ -150,7 +150,7 @@ func TestAccClusterConfigNodes(t *testing.T) {
 	resourceName := "kind_cluster.test"
 	clusterName := acctest.RandomWithPrefix("tf-acc-config-nodes-test")
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckKindClusterResourceDestroy(clusterName),
