@@ -24,13 +24,13 @@ func testSweepKindCluster(name string) error {
 	return nil
 }
 
-const nodeImage = "kindest/node:latest"
+const nodeImage = "kindest/node:v1.19.1"
 
 func TestAccCluster(t *testing.T) {
 	resourceName := "kind_cluster.test"
-	clusterName := acctest.RandomWithPrefix("tf-acc-test")
+	clusterName := acctest.RandomWithPrefix("tf-acc-cluster-test")
 
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckKindClusterResourceDestroy(clusterName),
@@ -55,6 +55,106 @@ func TestAccCluster(t *testing.T) {
 					resource.TestCheckNoResourceAttr(resourceName, "kind_config"),
 				),
 			},
+			{
+				Config: testAccNodeImageClusterConfig(clusterName),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckClusterCreate(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "name", clusterName),
+					resource.TestCheckResourceAttr(resourceName, "node_image", kindDefaults.Image),
+					resource.TestCheckResourceAttr(resourceName, "wait_for_ready", "false"),
+					resource.TestCheckNoResourceAttr(resourceName, "kind_config"),
+				),
+			},
+			{
+				Config: testAccNodeImageWaitForReadyClusterConfig(clusterName),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckClusterCreate(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "name", clusterName),
+					resource.TestCheckResourceAttr(resourceName, "node_image", kindDefaults.Image),
+					resource.TestCheckResourceAttr(resourceName, "wait_for_ready", "true"),
+					resource.TestCheckNoResourceAttr(resourceName, "kind_config"),
+				),
+			},
+			// TODO: add this for when resource update is implemented
+			// {
+			// 	ResourceName:      resourceName,
+			// 	ImportState:       true,
+			// 	ImportStateVerify: true,
+			// },
+		},
+	})
+}
+
+func TestAccClusterConfigBase(t *testing.T) {
+	resourceName := "kind_cluster.test"
+	clusterName := acctest.RandomWithPrefix("tf-acc-config-base-test")
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckKindClusterResourceDestroy(clusterName),
+		Steps: []resource.TestStep{
+			{
+				Config: testAccClusterConfigAndExtra(clusterName),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckClusterCreate(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "name", clusterName),
+					resource.TestCheckNoResourceAttr(resourceName, "node_image"),
+					resource.TestCheckResourceAttr(resourceName, "wait_for_ready", "false"),
+					resource.TestCheckResourceAttr(resourceName, "kind_config.#", "1"),
+					resource.TestCheckResourceAttr(resourceName, "kind_config.0.kind", "Cluster"),
+					resource.TestCheckResourceAttr(resourceName, "kind_config.0.api_version", "kind.x-k8s.io/v1alpha4"),
+				),
+			},
+			{
+				Config: testAccWaitForReadyClusterConfigAndExtra(clusterName),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckClusterCreate(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "name", clusterName),
+					resource.TestCheckNoResourceAttr(resourceName, "node_image"),
+					resource.TestCheckResourceAttr(resourceName, "wait_for_ready", "true"),
+					resource.TestCheckResourceAttr(resourceName, "kind_config.#", "1"),
+					resource.TestCheckResourceAttr(resourceName, "kind_config.0.kind", "Cluster"),
+					resource.TestCheckResourceAttr(resourceName, "kind_config.0.api_version", "kind.x-k8s.io/v1alpha4"),
+				),
+			},
+			{
+				Config: testAccNodeImageClusterConfigAndExtra(clusterName),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckClusterCreate(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "name", clusterName),
+					resource.TestCheckResourceAttr(resourceName, "node_image", kindDefaults.Image),
+					resource.TestCheckResourceAttr(resourceName, "wait_for_ready", "false"),
+					resource.TestCheckResourceAttr(resourceName, "kind_config.#", "1"),
+					resource.TestCheckResourceAttr(resourceName, "kind_config.0.kind", "Cluster"),
+					resource.TestCheckResourceAttr(resourceName, "kind_config.0.api_version", "kind.x-k8s.io/v1alpha4"),
+				),
+			},
+			{
+				Config: testAccNodeImageWaitForReadyClusterConfigAndExtra(clusterName),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckClusterCreate(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "name", clusterName),
+					resource.TestCheckResourceAttr(resourceName, "node_image", kindDefaults.Image),
+					resource.TestCheckResourceAttr(resourceName, "wait_for_ready", "true"),
+					resource.TestCheckResourceAttr(resourceName, "kind_config.#", "1"),
+					resource.TestCheckResourceAttr(resourceName, "kind_config.0.kind", "Cluster"),
+					resource.TestCheckResourceAttr(resourceName, "kind_config.0.api_version", "kind.x-k8s.io/v1alpha4"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccClusterConfigNodes(t *testing.T) {
+	resourceName := "kind_cluster.test"
+	clusterName := acctest.RandomWithPrefix("tf-acc-config-nodes-test")
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckKindClusterResourceDestroy(clusterName),
+		Steps: []resource.TestStep{
 			{
 				Config: testAccBasicExtraConfigClusterConfig(clusterName),
 				Check: resource.ComposeTestCheckFunc(
@@ -86,26 +186,6 @@ func TestAccCluster(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccNodeImageClusterConfig(clusterName),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckClusterCreate(resourceName),
-					resource.TestCheckResourceAttr(resourceName, "name", clusterName),
-					resource.TestCheckResourceAttr(resourceName, "node_image", kindDefaults.Image),
-					resource.TestCheckResourceAttr(resourceName, "wait_for_ready", "false"),
-					resource.TestCheckNoResourceAttr(resourceName, "kind_config"),
-				),
-			},
-			{
-				Config: testAccNodeImageWaitForReadyClusterConfig(clusterName),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckClusterCreate(resourceName),
-					resource.TestCheckResourceAttr(resourceName, "name", clusterName),
-					resource.TestCheckResourceAttr(resourceName, "node_image", kindDefaults.Image),
-					resource.TestCheckResourceAttr(resourceName, "wait_for_ready", "true"),
-					resource.TestCheckNoResourceAttr(resourceName, "kind_config"),
-				),
-			},
-			{
 				Config: testAccNodeImageExtraConfigClusterConfig(clusterName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckClusterCreate(resourceName),
@@ -118,12 +198,6 @@ func TestAccCluster(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "kind_config.0.nodes.#", "2"),
 					resource.TestCheckResourceAttr(resourceName, "kind_config.0.nodes.0.role", "control-plane"),
 					resource.TestCheckResourceAttr(resourceName, "kind_config.0.nodes.1.role", "worker"),
-					// 					resource.TestCheckResourceAttr(resourceName, "kind_config", `kind: Cluster
-					// apiVersion: kind.x-k8s.io/v1alpha4
-					// nodes:
-					// - role: control-plane
-					// - role: worker
-					// `),
 				),
 			},
 			{
@@ -169,17 +243,11 @@ func TestAccCluster(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "kind_config.0.api_version", "kind.x-k8s.io/v1alpha4"),
 					resource.TestCheckResourceAttr(resourceName, "kind_config.0.nodes.#", "3"),
 					resource.TestCheckResourceAttr(resourceName, "kind_config.0.nodes.0.role", "control-plane"),
-					resource.TestCheckResourceAttr(resourceName, "kind_config.0.nodes.0.image", nodeImage),
 					resource.TestCheckResourceAttr(resourceName, "kind_config.0.nodes.1.role", "worker"),
+					resource.TestCheckResourceAttr(resourceName, "kind_config.0.nodes.1.image", nodeImage),
 					resource.TestCheckResourceAttr(resourceName, "kind_config.0.nodes.2.role", "worker"),
 				),
 			},
-			// TODO: add this for when resource update is implemented
-			// {
-			// 	ResourceName:      resourceName,
-			// 	ImportState:       true,
-			// 	ImportStateVerify: true,
-			// },
 		},
 	})
 }
@@ -249,6 +317,60 @@ resource "kind_cluster" "test" {
   wait_for_ready = true
 }
 `, name, kindDefaults.Image)
+}
+
+func testAccNodeImageWaitForReadyClusterConfigAndExtra(name string) string {
+	return fmt.Sprintf(`
+resource "kind_cluster" "test" {
+  name = "%s"
+  node_image = "%s"
+  wait_for_ready = true
+  kind_config {
+	kind = "Cluster"
+	api_version = "kind.x-k8s.io/v1alpha4"
+  }
+}
+`, name, kindDefaults.Image)
+}
+
+func testAccNodeImageClusterConfigAndExtra(name string) string {
+	return fmt.Sprintf(`
+resource "kind_cluster" "test" {
+  name = "%s"
+  node_image = "%s"
+  wait_for_ready = false
+  kind_config {
+	kind = "Cluster"
+	api_version = "kind.x-k8s.io/v1alpha4"
+  }
+}
+`, name, kindDefaults.Image)
+}
+
+func testAccWaitForReadyClusterConfigAndExtra(name string) string {
+	return fmt.Sprintf(`
+resource "kind_cluster" "test" {
+  name = "%s"
+  wait_for_ready = true
+  kind_config {
+	kind = "Cluster"
+	api_version = "kind.x-k8s.io/v1alpha4"
+  }
+}
+`, name)
+}
+
+func testAccClusterConfigAndExtra(name string) string {
+	return fmt.Sprintf(`
+resource "kind_cluster" "test" {
+  name = "%s"
+  wait_for_ready = false
+  kind_config {
+	kind = "Cluster"
+	api_version = "kind.x-k8s.io/v1alpha4"
+  }
+}
+`, name)
 }
 
 func testAccBasicExtraConfigClusterConfig(name string) string {
@@ -372,11 +494,11 @@ resource "kind_cluster" "test" {
 
 	nodes {
 		role = "control-plane"
-		image = "%s"
 	}
 
 	nodes {
 		role = "worker"
+		image = "%s"
 	}
 
 	nodes {

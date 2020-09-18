@@ -12,22 +12,27 @@ func kindConfigFields() map[string]*schema.Schema {
 			Type:     schema.TypeString,
 			Required: true,
 			Optional: false,
+			ForceNew: true,
 		},
 		"api_version": {
 			Type:     schema.TypeString,
 			Required: true,
 			Optional: false,
+			ForceNew: true,
 		},
 		"nodes": {
 			Type:     schema.TypeList,
 			Optional: true,
+			ForceNew: true,
 			Elem: &schema.Resource{
 				Schema: kindConfigNodeFields(),
 			},
 		},
 		"networking": {
-			Type:     schema.TypeMap,
+			Type:     schema.TypeList,
 			Optional: true,
+			ForceNew: true,
+			MaxItems: 1,
 			Elem: &schema.Resource{
 				Schema: kindConfigNetworkingFields(),
 			},
