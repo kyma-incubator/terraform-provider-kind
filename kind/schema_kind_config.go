@@ -20,7 +20,7 @@ func kindConfigFields() map[string]*schema.Schema {
 			Optional: false,
 			ForceNew: true,
 		},
-		"nodes": {
+		"node": {
 			Type:     schema.TypeList,
 			Optional: true,
 			ForceNew: true,
@@ -37,6 +37,22 @@ func kindConfigFields() map[string]*schema.Schema {
 				Schema: kindConfigNetworkingFields(),
 			},
 		},
+	}
+	return forceNewAll(s)
+}
+
+// forceNewAll will take a schema and mark every attribute as ForceNew recursively.
+// This is a hack because we don't support updates to any part of the kind_config
+// but ForceNew at the top level still allows in-line updates of attributes.
+func forceNewAll(s map[string]*schema.Schema) map[string]*schema.Schema {
+	for _, ss := range s {
+		ss.ForceNew = true
+		if ss.Elem != nil {
+			switch ss.Elem.(type) {
+			case *schema.Resource:
+				forceNewAll(ss.Elem.(*schema.Resource).Schema)
+			}
+		}
 	}
 	return s
 }

@@ -37,11 +37,11 @@ resource "kind_cluster" "default" {
     node_image = "kindest/node:v1.18.4"
     kind_config  {
         kind = "Cluster"
-        apiVersion = "kind.x-k8s.io/v1alpha4"
-        nodes {
+        api_version = "kind.x-k8s.io/v1alpha4"
+        node {
             role = "control-plane"
         }
-        nodes {
+        node {
             role: worker
         }
     }
