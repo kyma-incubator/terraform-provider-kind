@@ -172,7 +172,7 @@ func resourceKindClusterRead(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceKindClusterUpdate(d *schema.ResourceData, meta interface{}) error {
-	log.Println("")
+	log.Println("Updating...")
 	d.Partial(true)
 
 	if d.HasChange("node_image") {

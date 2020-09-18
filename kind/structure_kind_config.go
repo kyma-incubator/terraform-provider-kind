@@ -20,6 +20,14 @@ func flattenKindConfig(d map[string]interface{}) *v1alpha4.Cluster {
 		}
 	}
 
+	networking := mapKeyIfExists(d, "networking")
+	if networking != nil {
+		if n := networking.([]interface{}); len(n) == 1 { // MaxItems: 1, no more than one allowed so we don't have to loop here
+			data := n[0].(map[string]interface{})
+			obj.Networking = flattenKindConfigNetworking(data)
+		}
+	}
+
 	return obj
 }
 
@@ -62,6 +70,57 @@ func flattenKindConfigNodes(d map[string]interface{}) v1alpha4.Node {
 			data := k.(string)
 			obj.KubeadmConfigPatches = append(obj.KubeadmConfigPatches, data)
 		}
+	}
+
+	return obj
+}
+
+func flattenKindConfigNetworking(d map[string]interface{}) v1alpha4.Networking {
+	obj := v1alpha4.Networking{}
+
+	apiServerAddress := mapKeyIfExists(d, "api_server_address")
+	if apiServerAddress != nil && apiServerAddress.(string) != "" {
+		obj.APIServerAddress = apiServerAddress.(string)
+	}
+
+	apiServerPort := mapKeyIfExists(d, "api_server_port")
+	if apiServerPort != nil {
+		obj.APIServerPort = apiServerPort.(int32)
+	}
+
+	disableDefaultCNI := mapKeyIfExists(d, "disable_default_cni")
+	if disableDefaultCNI != nil {
+		obj.DisableDefaultCNI = disableDefaultCNI.(bool)
+	}
+
+	ipFamily := mapKeyIfExists(d, "ip_family")
+	if ipFamily != nil && ipFamily.(string) != "" {
+		switch ipFamily.(string) {
+		case string(v1alpha4.IPv4Family):
+			obj.IPFamily = v1alpha4.IPv4Family
+		case string(v1alpha4.IPv6Family):
+			obj.IPFamily = v1alpha4.IPv6Family
+		}
+	}
+
+	kubeProxyMode := mapKeyIfExists(d, "kube_proxy_mode")
+	if kubeProxyMode != nil && kubeProxyMode.(string) != "" {
+		switch kubeProxyMode.(string) {
+		case string(v1alpha4.IPTablesMode):
+			obj.KubeProxyMode = v1alpha4.IPTablesMode
+		case string(v1alpha4.IPVSMode):
+			obj.KubeProxyMode = v1alpha4.IPVSMode
+		}
+	}
+
+	podSubnet := mapKeyIfExists(d, "pod_subnet")
+	if podSubnet != nil && podSubnet.(string) != "" {
+		obj.PodSubnet = podSubnet.(string)
+	}
+
+	serviceSubnet := mapKeyIfExists(d, "service_subnet")
+	if serviceSubnet != nil && serviceSubnet.(string) != "" {
+		obj.ServiceSubnet = serviceSubnet.(string)
 	}
 
 	return obj
