@@ -12,7 +12,7 @@ func flattenKindConfig(d map[string]interface{}) *v1alpha4.Cluster {
 	obj.Kind = mapKeyIfExists(d, "kind").(string)
 	obj.APIVersion = mapKeyIfExists(d, "api_version").(string)
 
-	nodes := mapKeyIfExists(d, "nodes")
+	nodes := mapKeyIfExists(d, "node")
 	if nodes != nil {
 		for _, n := range nodes.([]interface{}) {
 			data := n.(map[string]interface{})
