@@ -165,9 +165,9 @@ func TestAccClusterConfigNodes(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "kind_config.#", "1"),
 					resource.TestCheckResourceAttr(resourceName, "kind_config.0.kind", "Cluster"),
 					resource.TestCheckResourceAttr(resourceName, "kind_config.0.api_version", "kind.x-k8s.io/v1alpha4"),
-					resource.TestCheckResourceAttr(resourceName, "kind_config.0.nodes.#", "2"),
-					resource.TestCheckResourceAttr(resourceName, "kind_config.0.nodes.0.role", "control-plane"),
-					resource.TestCheckResourceAttr(resourceName, "kind_config.0.nodes.1.role", "worker"),
+					resource.TestCheckResourceAttr(resourceName, "kind_config.0.node.#", "2"),
+					resource.TestCheckResourceAttr(resourceName, "kind_config.0.node.0.role", "control-plane"),
+					resource.TestCheckResourceAttr(resourceName, "kind_config.0.node.1.role", "worker"),
 				),
 			},
 			{
@@ -180,9 +180,9 @@ func TestAccClusterConfigNodes(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "kind_config.#", "1"),
 					resource.TestCheckResourceAttr(resourceName, "kind_config.0.kind", "Cluster"),
 					resource.TestCheckResourceAttr(resourceName, "kind_config.0.api_version", "kind.x-k8s.io/v1alpha4"),
-					resource.TestCheckResourceAttr(resourceName, "kind_config.0.nodes.#", "2"),
-					resource.TestCheckResourceAttr(resourceName, "kind_config.0.nodes.0.role", "control-plane"),
-					resource.TestCheckResourceAttr(resourceName, "kind_config.0.nodes.1.role", "worker"),
+					resource.TestCheckResourceAttr(resourceName, "kind_config.0.node.#", "2"),
+					resource.TestCheckResourceAttr(resourceName, "kind_config.0.node.0.role", "control-plane"),
+					resource.TestCheckResourceAttr(resourceName, "kind_config.0.node.1.role", "worker"),
 				),
 			},
 			{
@@ -195,9 +195,9 @@ func TestAccClusterConfigNodes(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "kind_config.#", "1"),
 					resource.TestCheckResourceAttr(resourceName, "kind_config.0.kind", "Cluster"),
 					resource.TestCheckResourceAttr(resourceName, "kind_config.0.api_version", "kind.x-k8s.io/v1alpha4"),
-					resource.TestCheckResourceAttr(resourceName, "kind_config.0.nodes.#", "2"),
-					resource.TestCheckResourceAttr(resourceName, "kind_config.0.nodes.0.role", "control-plane"),
-					resource.TestCheckResourceAttr(resourceName, "kind_config.0.nodes.1.role", "worker"),
+					resource.TestCheckResourceAttr(resourceName, "kind_config.0.node.#", "2"),
+					resource.TestCheckResourceAttr(resourceName, "kind_config.0.node.0.role", "control-plane"),
+					resource.TestCheckResourceAttr(resourceName, "kind_config.0.node.1.role", "worker"),
 				),
 			},
 			{
@@ -210,9 +210,9 @@ func TestAccClusterConfigNodes(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "kind_config.#", "1"),
 					resource.TestCheckResourceAttr(resourceName, "kind_config.0.kind", "Cluster"),
 					resource.TestCheckResourceAttr(resourceName, "kind_config.0.api_version", "kind.x-k8s.io/v1alpha4"),
-					resource.TestCheckResourceAttr(resourceName, "kind_config.0.nodes.#", "2"),
-					resource.TestCheckResourceAttr(resourceName, "kind_config.0.nodes.0.role", "control-plane"),
-					resource.TestCheckResourceAttr(resourceName, "kind_config.0.nodes.1.role", "worker"),
+					resource.TestCheckResourceAttr(resourceName, "kind_config.0.node.#", "2"),
+					resource.TestCheckResourceAttr(resourceName, "kind_config.0.node.0.role", "control-plane"),
+					resource.TestCheckResourceAttr(resourceName, "kind_config.0.node.1.role", "worker"),
 				),
 			},
 			{
@@ -225,10 +225,10 @@ func TestAccClusterConfigNodes(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "kind_config.#", "1"),
 					resource.TestCheckResourceAttr(resourceName, "kind_config.0.kind", "Cluster"),
 					resource.TestCheckResourceAttr(resourceName, "kind_config.0.api_version", "kind.x-k8s.io/v1alpha4"),
-					resource.TestCheckResourceAttr(resourceName, "kind_config.0.nodes.#", "3"),
-					resource.TestCheckResourceAttr(resourceName, "kind_config.0.nodes.0.role", "control-plane"),
-					resource.TestCheckResourceAttr(resourceName, "kind_config.0.nodes.1.role", "worker"),
-					resource.TestCheckResourceAttr(resourceName, "kind_config.0.nodes.2.role", "worker"),
+					resource.TestCheckResourceAttr(resourceName, "kind_config.0.node.#", "3"),
+					resource.TestCheckResourceAttr(resourceName, "kind_config.0.node.0.role", "control-plane"),
+					resource.TestCheckResourceAttr(resourceName, "kind_config.0.node.1.role", "worker"),
+					resource.TestCheckResourceAttr(resourceName, "kind_config.0.node.2.role", "worker"),
 				),
 			},
 			{
@@ -241,11 +241,11 @@ func TestAccClusterConfigNodes(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "kind_config.#", "1"),
 					resource.TestCheckResourceAttr(resourceName, "kind_config.0.kind", "Cluster"),
 					resource.TestCheckResourceAttr(resourceName, "kind_config.0.api_version", "kind.x-k8s.io/v1alpha4"),
-					resource.TestCheckResourceAttr(resourceName, "kind_config.0.nodes.#", "3"),
-					resource.TestCheckResourceAttr(resourceName, "kind_config.0.nodes.0.role", "control-plane"),
-					resource.TestCheckResourceAttr(resourceName, "kind_config.0.nodes.1.role", "worker"),
-					resource.TestCheckResourceAttr(resourceName, "kind_config.0.nodes.1.image", nodeImage),
-					resource.TestCheckResourceAttr(resourceName, "kind_config.0.nodes.2.role", "worker"),
+					resource.TestCheckResourceAttr(resourceName, "kind_config.0.node.#", "3"),
+					resource.TestCheckResourceAttr(resourceName, "kind_config.0.node.0.role", "control-plane"),
+					resource.TestCheckResourceAttr(resourceName, "kind_config.0.node.1.role", "worker"),
+					resource.TestCheckResourceAttr(resourceName, "kind_config.0.node.1.image", nodeImage),
+					resource.TestCheckResourceAttr(resourceName, "kind_config.0.node.2.role", "worker"),
 				),
 			},
 		},
@@ -381,11 +381,11 @@ resource "kind_cluster" "test" {
 	kind = "Cluster"
 	api_version = "kind.x-k8s.io/v1alpha4"
 
-	nodes {
+	node {
 		role = "control-plane"
 	}
 
-	nodes {
+	node {
 		role = "worker"
 	}
   }
@@ -402,11 +402,11 @@ resource "kind_cluster" "test" {
 	kind = "Cluster"
 	api_version = "kind.x-k8s.io/v1alpha4"
 
-	nodes {
+	node {
 		role = "control-plane"
 	}
 
-	nodes {
+	node {
 		role = "worker"
 	}
   }
@@ -423,11 +423,11 @@ resource "kind_cluster" "test" {
 	kind = "Cluster"
 	api_version = "kind.x-k8s.io/v1alpha4"
 
-	nodes {
+	node {
 		role = "control-plane"
 	}
 
-	nodes {
+	node {
 		role = "worker"
 	}
   }
@@ -445,11 +445,11 @@ resource "kind_cluster" "test" {
 	kind = "Cluster"
 	api_version = "kind.x-k8s.io/v1alpha4"
 
-	nodes {
-		role = "control-plane"
+	node {
+	  role = "control-plane"
 	}
 
-	nodes {
+	node {
 		role = "worker"
 	}
   }
@@ -467,15 +467,15 @@ resource "kind_cluster" "test" {
 	kind = "Cluster"
 	api_version = "kind.x-k8s.io/v1alpha4"
 
-	nodes {
+	node {
 		role = "control-plane"
 	}
 
-	nodes {
+	node {
 		role = "worker"
 	}
 
-	nodes {
+	node {
 		role = "worker"
 	}
   }
@@ -492,16 +492,16 @@ resource "kind_cluster" "test" {
 	kind = "Cluster"
 	api_version = "kind.x-k8s.io/v1alpha4"
 
-	nodes {
+	node {
 		role = "control-plane"
 	}
 
-	nodes {
+	node {
 		role = "worker"
 		image = "%s"
 	}
 
-	nodes {
+	node {
 		role = "worker"
 	}
   }
