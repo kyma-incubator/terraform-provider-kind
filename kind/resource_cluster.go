@@ -7,7 +7,6 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	clientcmd "k8s.io/client-go/tools/clientcmd"
-	kindDefaults "sigs.k8s.io/kind/pkg/apis/config/defaults"
 	"sigs.k8s.io/kind/pkg/cluster"
 	"sigs.k8s.io/kind/pkg/cmd"
 )
@@ -47,10 +46,14 @@ func resourceCluster() *schema.Resource {
 				Optional:    true,
 			},
 			"kind_config": {
-				Type:        schema.TypeString,
-				Description: `The kind_config that kind will use.`,
+				Type:        schema.TypeList,
+				Description: `The kind_config that kind will use to bootstrap the cluster.`,
 				Optional:    true,
 				ForceNew:    true,
+				MaxItems:    1,
+				Elem: &schema.Resource{
+					Schema: kindConfigFields(),
+				},
 			},
 			"kubeconfig": {
 				Type:        schema.TypeString,
@@ -90,20 +93,24 @@ func resourceKindClusterCreate(d *schema.ResourceData, meta interface{}) error {
 	log.Println("Creating local Kubernetes cluster...")
 	name := d.Get("name").(string)
 	nodeImage := d.Get("node_image").(string)
-	config := d.Get("kind_config").(string)
+	config := d.Get("kind_config")
 	waitForReady := d.Get("wait_for_ready").(bool)
 
 	var copts []cluster.CreateOption
-	if config != "" {
-		copts = append(copts, cluster.CreateWithRawConfig([]byte(config)))
+
+	if config != nil {
+		cfg := config.([]interface{})
+		if len(cfg) == 1 { // there is always just one kind_config allowed
+			if data, ok := cfg[0].(map[string]interface{}); ok {
+				opts := flattenKindConfig(data)
+				copts = append(copts, cluster.CreateWithV1Alpha4Config(opts))
+			}
+		}
 	}
 
 	if nodeImage != "" {
 		copts = append(copts, cluster.CreateWithNodeImage(nodeImage))
 		log.Printf("Using defined node_image: %s\n", nodeImage)
-	} else {
-		d.Set("node_image", kindDefaults.Image) // set image to k/kind default image.
-		nodeImage = kindDefaults.Image
 	}
 
 	if waitForReady {
@@ -165,7 +172,7 @@ func resourceKindClusterRead(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceKindClusterUpdate(d *schema.ResourceData, meta interface{}) error {
-	log.Println("")
+	log.Println("Updating...")
 	d.Partial(true)
 
 	if d.HasChange("node_image") {
