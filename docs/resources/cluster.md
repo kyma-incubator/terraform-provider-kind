@@ -42,7 +42,7 @@ resource "kind_cluster" "default" {
             role = "control-plane"
         }
         node {
-            role: worker
+            role =  "worker"
         }
     }
 }
