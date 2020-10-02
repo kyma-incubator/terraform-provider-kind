@@ -37,6 +37,13 @@ func kindConfigFields() map[string]*schema.Schema {
 				Schema: kindConfigNetworkingFields(),
 			},
 		},
+		"containerd_config_patches": {
+			Type:     schema.TypeList,
+			Optional: true,
+			Elem: &schema.Schema{
+				Type: schema.TypeString,
+			},
+		},
 	}
 	return forceNewAll(s)
 }
