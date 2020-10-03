@@ -41,7 +41,12 @@ func kindConfigFields() map[string]*schema.Schema {
 			Type:     schema.TypeList,
 			Optional: true,
 			Elem: &schema.Schema{
-				Type: schema.TypeString,
+				Type:         schema.TypeString,
+				ValidateFunc: stringIsValidToml,
+				StateFunc: func(tomlString interface{}) string {
+					normalizeToml, _ := normalizeToml(tomlString)
+					return normalizeToml
+				},
 			},
 		},
 	}
