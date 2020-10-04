@@ -11,6 +11,7 @@ require (
 	github.com/hashicorp/terraform-config-inspect v0.0.0-20191212124732-c6ae6269b9d7 // indirect
 	github.com/hashicorp/terraform-plugin-sdk v1.15.0
 	github.com/imdario/mergo v0.3.9 // indirect
+	github.com/pelletier/go-toml v1.8.0
 	github.com/zclconf/go-cty v1.5.1 // indirect
 	github.com/zclconf/go-cty-yaml v1.0.2 // indirect
 	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9 // indirect

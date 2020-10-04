@@ -37,6 +37,22 @@ func kindConfigFields() map[string]*schema.Schema {
 				Schema: kindConfigNetworkingFields(),
 			},
 		},
+		"containerd_config_patches": {
+			Type:     schema.TypeList,
+			Optional: true,
+			Elem: &schema.Schema{
+				Type:         schema.TypeString,
+				ValidateFunc: stringIsValidToml,
+				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
+					// We can ignore these errors for two reasons:
+					// 1. normalizeToml returns the input in case of error
+					// 2. the ValidateFunc should ensure an early exit
+					normalizedOld, _ := normalizeToml(old)
+					normalizedNew, _ := normalizeToml(new)
+					return normalizedOld == normalizedNew
+				},
+			},
+		},
 	}
 	return forceNewAll(s)
 }

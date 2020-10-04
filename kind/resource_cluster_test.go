@@ -252,6 +252,62 @@ func TestAccClusterConfigNodes(t *testing.T) {
 	})
 }
 
+func TestAccClusterContainerdPatches(t *testing.T) {
+	resourceName := "kind_cluster.test"
+	clusterName := acctest.RandomWithPrefix("tf-acc-containerd-test")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckKindClusterResourceDestroy(clusterName),
+		Steps: []resource.TestStep{
+			{
+				Config: testSingleContainerdConfigPatch(clusterName),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckClusterCreate(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "name", clusterName),
+					resource.TestCheckNoResourceAttr(resourceName, "node_image"),
+					resource.TestCheckResourceAttr(resourceName, "wait_for_ready", "true"),
+					resource.TestCheckResourceAttr(resourceName, "kind_config.#", "1"),
+					resource.TestCheckResourceAttr(resourceName, "kind_config.0.kind", "Cluster"),
+					resource.TestCheckResourceAttr(resourceName, "kind_config.0.api_version", "kind.x-k8s.io/v1alpha4"),
+					resource.TestCheckResourceAttr(resourceName, "kind_config.0.containerd_config_patches.#", "1"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccContainerdPatchFormatOnlyChangeIsNoop(t *testing.T) {
+	resourceName := "kind_cluster.test"
+	clusterName := acctest.RandomWithPrefix("tf-acc-containerd-formatting")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckKindClusterResourceDestroy(clusterName),
+		Steps: []resource.TestStep{
+			{
+				Config: testTwoContainerdConfigPatches(clusterName),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckClusterCreate(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "name", clusterName),
+					resource.TestCheckNoResourceAttr(resourceName, "node_image"),
+					resource.TestCheckResourceAttr(resourceName, "wait_for_ready", "true"),
+					resource.TestCheckResourceAttr(resourceName, "kind_config.#", "1"),
+					resource.TestCheckResourceAttr(resourceName, "kind_config.0.kind", "Cluster"),
+					resource.TestCheckResourceAttr(resourceName, "kind_config.0.api_version", "kind.x-k8s.io/v1alpha4"),
+					resource.TestCheckResourceAttr(resourceName, "kind_config.0.containerd_config_patches.#", "2"),
+				),
+			},
+			{
+				Config:   testContainerdPatchWithSameContentButDifferentFormat(clusterName),
+				PlanOnly: true,
+			},
+		},
+	})
+}
+
 // testAccCheckKindClusterResourceDestroy verifies the kind cluster
 // has been destroyed
 func testAccCheckKindClusterResourceDestroy(clusterName string) resource.TestCheckFunc {
@@ -507,4 +563,79 @@ resource "kind_cluster" "test" {
   }
 }
 `, name, nodeImage)
+}
+
+func testSingleContainerdConfigPatch(name string) string {
+	return fmt.Sprintf(`
+resource "kind_cluster" "test" {
+  name = "%s"
+  wait_for_ready = true
+  kind_config {
+	kind = "Cluster"
+	api_version = "kind.x-k8s.io/v1alpha4"
+	containerd_config_patches = [
+		<<-TOML
+		[plugins."io.containerd.grpc.v1.cri".registry.mirrors."localhost:5000"]
+			endpoint = ["http://kind-registry:5000"]
+		TOML
+	]
+  }
+}
+`, name)
+}
+
+func testTwoContainerdConfigPatches(name string) string {
+	return fmt.Sprintf(`
+resource "kind_cluster" "test" {
+  name = "%s"
+  wait_for_ready = true
+  kind_config {
+	kind = "Cluster"
+	api_version = "kind.x-k8s.io/v1alpha4"
+	containerd_config_patches = [
+		<<-TOML
+		[plugins."io.containerd.grpc.v1.cri".registry.mirrors."localhost:5000"]
+			endpoint = ["http://kind-registry:5000"]
+		TOML
+		,
+		<<-TOML
+		[plugins."io.containerd.grpc.v1.cri"]
+			sandbox_image = "k8s.gcr.io/pause:3.2"
+		TOML
+	]
+  }
+}
+`, name)
+}
+
+func testContainerdPatchWithSameContentButDifferentFormat(name string) string {
+	return fmt.Sprintf(`
+resource "kind_cluster" "test" {
+  name = "%s"
+  wait_for_ready = true
+  kind_config {
+	kind = "Cluster"
+	api_version = "kind.x-k8s.io/v1alpha4"
+	containerd_config_patches = [
+		<<-TOML
+[plugins]
+
+  [plugins."io.containerd.grpc.v1.cri"]
+
+    [plugins."io.containerd.grpc.v1.cri".registry]
+
+      [plugins."io.containerd.grpc.v1.cri".registry.mirrors]
+
+        [plugins."io.containerd.grpc.v1.cri".registry.mirrors."localhost:5000"]
+          endpoint = ["http://kind-registry:5000"]
+		TOML
+		,
+		<<-TOML
+		[plugins."io.containerd.grpc.v1.cri"]
+			sandbox_image = "k8s.gcr.io/pause:3.2"
+		TOML
+	]
+  }
+}
+`, name)
 }

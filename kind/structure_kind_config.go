@@ -28,6 +28,14 @@ func flattenKindConfig(d map[string]interface{}) *v1alpha4.Cluster {
 		}
 	}
 
+	containerdConfigPatches := mapKeyIfExists(d, "containerd_config_patches")
+	if containerdConfigPatches != nil {
+		for _, p := range containerdConfigPatches.([]interface{}) {
+			patch := p.(string)
+			obj.ContainerdConfigPatches = append(obj.ContainerdConfigPatches, patch)
+		}
+	}
+
 	return obj
 }
 
