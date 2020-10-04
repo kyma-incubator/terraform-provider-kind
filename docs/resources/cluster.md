@@ -48,6 +48,25 @@ resource "kind_cluster" "default" {
 }
 ```
 
+
+```hcl
+provider "kind" {}
+
+# Create a cluster with patches applied to the containerd config
+resource "kind_cluster" "default" {
+    name = "test-cluster"
+    node_image = "kindest/node:v1.16.1"
+    kind_config = {
+        containerd_config_patches = [
+            <<-TOML
+            [plugins."io.containerd.grpc.v1.cri".registry.mirrors."localhost:5000"]
+                endpoint = ["http://kind-registry:5000"]
+            TOML
+        ]
+    }
+}
+```
+
 ## Argument Reference
 
 * `name` - (Required) The kind name that is given to the created cluster.
