@@ -23,8 +23,10 @@ func flattenKindConfig(d map[string]interface{}) *v1alpha4.Cluster {
 	networking := mapKeyIfExists(d, "networking")
 	if networking != nil {
 		if n := networking.([]interface{}); len(n) == 1 { // MaxItems: 1, no more than one allowed so we don't have to loop here
-			data := n[0].(map[string]interface{})
-			obj.Networking = flattenKindConfigNetworking(data)
+			if n[0] != nil {
+				data := n[0].(map[string]interface{})
+				obj.Networking = flattenKindConfigNetworking(data)
+			}
 		}
 	}
 
@@ -93,7 +95,7 @@ func flattenKindConfigNetworking(d map[string]interface{}) v1alpha4.Networking {
 
 	apiServerPort := mapKeyIfExists(d, "api_server_port")
 	if apiServerPort != nil {
-		obj.APIServerPort = apiServerPort.(int32)
+		obj.APIServerPort = int32(apiServerPort.(int))
 	}
 
 	disableDefaultCNI := mapKeyIfExists(d, "disable_default_cni")
@@ -174,11 +176,11 @@ func flattenKindConfigExtraPortMappings(d map[string]interface{}) v1alpha4.PortM
 
 	containerPort := mapKeyIfExists(d, "container_port")
 	if containerPort != nil {
-		obj.ContainerPort = containerPort.(int32)
+		obj.ContainerPort = int32(containerPort.(int))
 	}
 	hostPort := mapKeyIfExists(d, "host_port")
 	if hostPort != nil {
-		obj.HostPort = hostPort.(int32)
+		obj.HostPort = int32(hostPort.(int))
 	}
 	listenAddress := mapKeyIfExists(d, "listen_address")
 	if listenAddress != nil && listenAddress.(string) != "" {
