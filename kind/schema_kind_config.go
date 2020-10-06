@@ -132,7 +132,6 @@ func kindConfigNetworkingFields() map[string]*schema.Schema {
 		},
 		"disable_default_cni": {
 			Type:     schema.TypeBool,
-			Default:  false,
 			Optional: true,
 		},
 		"kube_proxy_mode": {
