@@ -55,14 +55,16 @@ func resourceCluster() *schema.Resource {
 					Schema: kindConfigFields(),
 				},
 			},
+			"kubeconfig_path": {
+				Type:        schema.TypeString,
+				Description: `Kubeconfig path set after the the cluster is created or by the user to override defaults.`,
+				ForceNew:    true,
+				Optional:    true,
+				Computed:    true,
+			},
 			"kubeconfig": {
 				Type:        schema.TypeString,
 				Description: `Kubeconfig set after the the cluster is created.`,
-				Computed:    true,
-			},
-			"kubeconfig_path": {
-				Type:        schema.TypeString,
-				Description: `Kubeconfig path set after the the cluster is created.`,
 				Computed:    true,
 			},
 			"client_certificate": {
@@ -95,8 +97,16 @@ func resourceKindClusterCreate(d *schema.ResourceData, meta interface{}) error {
 	nodeImage := d.Get("node_image").(string)
 	config := d.Get("kind_config")
 	waitForReady := d.Get("wait_for_ready").(bool)
+	kubeconfigPath := d.Get("kubeconfig_path")
 
 	var copts []cluster.CreateOption
+
+	if kubeconfigPath != nil {
+		path := kubeconfigPath.(string)
+		if path != "" {
+			copts = append(copts, cluster.CreateWithKubeconfigPath(path))
+		}
+	}
 
 	if config != nil {
 		cfg := config.([]interface{})
@@ -147,13 +157,16 @@ func resourceKindClusterRead(d *schema.ResourceData, meta interface{}) error {
 		d.SetId("")
 		return err
 	}
-	exportPath := fmt.Sprintf("%s%s%s-config", currentPath, string(os.PathSeparator), name)
-	err = provider.ExportKubeConfig(name, exportPath)
-	if err != nil {
-		d.SetId("")
-		return err
+
+	if _, ok := d.GetOkExists("kubeconfig_path"); !ok {
+		exportPath := fmt.Sprintf("%s%s%s-config", currentPath, string(os.PathSeparator), name)
+		err = provider.ExportKubeConfig(name, exportPath)
+		if err != nil {
+			d.SetId("")
+			return err
+		}
+		d.Set("kubeconfig_path", exportPath)
 	}
-	d.Set("kubeconfig_path", exportPath)
 
 	// use the current context in kubeconfig
 	config, err := clientcmd.RESTConfigFromKubeConfig([]byte(kconfig))
@@ -183,6 +196,10 @@ func resourceKindClusterUpdate(d *schema.ResourceData, meta interface{}) error {
 	}
 	if d.HasChange("kind_config") {
 		d.SetPartial("kind_config")
+	}
+
+	if d.HasChange("kubeconfig_path") {
+		d.SetPartial("kubeconfig_path")
 	}
 
 	d.Partial(false)
