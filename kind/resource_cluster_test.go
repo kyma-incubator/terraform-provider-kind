@@ -46,6 +46,17 @@ func TestAccCluster(t *testing.T) {
 				),
 			},
 			{
+				Config: testAccBasicClusterConfigWithKubeconfigPath(clusterName),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckClusterCreate(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "name", clusterName),
+					resource.TestCheckResourceAttr(resourceName, "kubeconfig_path", "/tmp/kind-provider-test/new_file"),
+					resource.TestCheckNoResourceAttr(resourceName, "node_image"),
+					resource.TestCheckResourceAttr(resourceName, "wait_for_ready", "false"),
+					resource.TestCheckNoResourceAttr(resourceName, "kind_config"),
+				),
+			},
+			{
 				Config: testAccBasicWaitForReadyClusterConfig(clusterName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckClusterCreate(resourceName),
@@ -356,6 +367,16 @@ func testAccBasicClusterConfig(name string) string {
 	return fmt.Sprintf(`
 resource "kind_cluster" "test" {
   name = "%s"
+}
+`, name)
+}
+
+func testAccBasicClusterConfigWithKubeconfigPath(name string) string {
+
+	return fmt.Sprintf(`
+resource "kind_cluster" "test" {
+  name = "%s"
+  kubeconfig_path = "/tmp/kind-provider-test/new_file"
 }
 `, name)
 }
