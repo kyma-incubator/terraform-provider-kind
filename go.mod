@@ -16,8 +16,7 @@ require (
 	github.com/zclconf/go-cty-yaml v1.0.2 // indirect
 	gopkg.in/yaml.v2 v2.3.0 // indirect
 	k8s.io/client-go v12.0.0+incompatible
-	k8s.io/utils v0.0.0-20200619165400-6e3d28b6ed19 // indirect
-	sigs.k8s.io/kind v0.10.0
+	sigs.k8s.io/kind v0.11.0
 )
 
-replace k8s.io/client-go => k8s.io/client-go v0.18.5
+replace k8s.io/client-go => k8s.io/client-go v0.20.2
