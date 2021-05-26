@@ -116,10 +116,10 @@ func flattenKindConfigNetworking(d map[string]interface{}) v1alpha4.Networking {
 	kubeProxyMode := mapKeyIfExists(d, "kube_proxy_mode")
 	if kubeProxyMode != nil && kubeProxyMode.(string) != "" {
 		switch kubeProxyMode.(string) {
-		case string(v1alpha4.IPTablesMode):
-			obj.KubeProxyMode = v1alpha4.IPTablesMode
-		case string(v1alpha4.IPVSMode):
-			obj.KubeProxyMode = v1alpha4.IPVSMode
+		case string(v1alpha4.IPTablesProxyMode):
+			obj.KubeProxyMode = v1alpha4.IPTablesProxyMode
+		case string(v1alpha4.IPVSProxyMode):
+			obj.KubeProxyMode = v1alpha4.IPVSProxyMode
 		}
 	}
 
