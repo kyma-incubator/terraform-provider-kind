@@ -1,6 +1,6 @@
 module github.com/kyma-incubator/terraform-provider-kind
 
-go 1.13
+go 1.16
 
 require (
 	github.com/apparentlymart/go-cidr v1.1.0 // indirect
@@ -16,7 +16,7 @@ require (
 	github.com/zclconf/go-cty-yaml v1.0.2 // indirect
 	gopkg.in/yaml.v2 v2.3.0 // indirect
 	k8s.io/client-go v12.0.0+incompatible
-	sigs.k8s.io/kind v0.11.0
+	sigs.k8s.io/kind v0.11.1
 )
 
 replace k8s.io/client-go => k8s.io/client-go v0.20.2

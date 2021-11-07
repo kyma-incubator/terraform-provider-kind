@@ -104,6 +104,20 @@ resource "kind_cluster" "default" {
 }
 ```
 
+If specifying a kubeconfig path containing a `~/some/random/path` character, be aware that terraform is not expanding the path unless you specify it via `pathexpand("~/some/random/path")`
+
+```hcl
+locals {
+    k8s_config_path = pathexpand("~/folder/config")
+}
+
+resource "kind_cluster" "default" {
+    name = "test-cluster"
+    kubeconfig_path = local.k8s_config_path
+    # ...
+}
+```
+
 ## Argument Reference
 
 * `name` - (Required) The kind name that is given to the created cluster.
