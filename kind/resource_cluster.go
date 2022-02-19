@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	clientcmd "k8s.io/client-go/tools/clientcmd"
 	"sigs.k8s.io/kind/pkg/cluster"
 	"sigs.k8s.io/kind/pkg/cmd"
@@ -182,28 +182,6 @@ func resourceKindClusterRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("completed", true)
 
 	return nil
-}
-
-func resourceKindClusterUpdate(d *schema.ResourceData, meta interface{}) error {
-	log.Println("Updating...")
-	d.Partial(true)
-
-	if d.HasChange("node_image") {
-		d.SetPartial("node_image")
-	}
-	if d.HasChange("name") {
-		d.SetPartial("name")
-	}
-	if d.HasChange("kind_config") {
-		d.SetPartial("kind_config")
-	}
-
-	if d.HasChange("kubeconfig_path") {
-		d.SetPartial("kubeconfig_path")
-	}
-
-	d.Partial(false)
-	return resourceKindClusterRead(d, meta)
 }
 
 func resourceKindClusterDelete(d *schema.ResourceData, meta interface{}) error {
