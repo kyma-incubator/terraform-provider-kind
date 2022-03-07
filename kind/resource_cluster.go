@@ -87,6 +87,11 @@ func resourceCluster() *schema.Resource {
 				Description: `Kubernetes APIServer endpoint.`,
 				Computed:    true,
 			},
+			"completed": {
+				Type:        schema.TypeBool,
+				Description: `Cluster successfully created.`,
+				Computed:    true,
+			},
 		},
 	}
 }
