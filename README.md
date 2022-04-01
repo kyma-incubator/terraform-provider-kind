@@ -1,4 +1,12 @@
 
+
+## :warning: **Archived**
+
+This repository has been deprecated and archived on Apr 1th, 2022.
+
+An actively maintained fork can be found at https://github.com/tehcyx/terraform-provider-kind.
+
+
 # Terraform Provider for kind
 
 
